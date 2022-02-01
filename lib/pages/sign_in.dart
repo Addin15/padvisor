@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/sign_up.dart';
 
 import '../shared/color_constant.dart';
 import '../shared/constant_styles.dart';
@@ -104,7 +105,12 @@ class _SignInState extends State<SignIn> {
                     const Text('Didn\'t have an account'),
                     const SizedBox(height: 10),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUp()));
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 50),
