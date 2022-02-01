@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:padvisor/pages/sign_in.dart';
+
+import 'pages/advisor/advisor_dashboard.dart';
+import 'pages/coordinator/coordinator_dashboard.dart';
+import 'pages/hod/hod_dashboard.dart';
+import 'pages/sign_in.dart';
+import 'pages/sign_up.dart';
+import 'pages/student/student_dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +22,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SignIn(),
+      routes: {
+        'signin': (context) => const SignIn(),
+        'signup': (context) => const SignUp(),
+        'student': (context) => const StudentDashboard(),
+        'hod': (context) => const HodDashboard(),
+        'coordinator': (context) => const CoordinatorDashboard(),
+        'advisor': (context) => const AdvisorDashboard(),
+      },
+      initialRoute: 'signin',
     );
   }
 }
