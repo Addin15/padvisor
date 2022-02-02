@@ -19,21 +19,21 @@ class AdvisorViewProblem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 15),
-            Text(
+            const Text(
               'Student Name',
               style: TextStyle(
                 fontSize: 22,
               ),
             ),
             const SizedBox(height: 15),
-            Text(
+            const Text(
               'Student Matric',
               style: TextStyle(
                 fontSize: 18,
               ),
             ),
             const SizedBox(height: 15),
-            Text(
+            const Text(
               'Student Problem',
               style: TextStyle(
                 fontSize: 18,
@@ -50,7 +50,7 @@ class AdvisorViewProblem extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              child: Text(
+              child: const Text(
                 'Problem details....\n\n\n',
                 style: TextStyle(
                   fontSize: 14,
@@ -69,11 +69,12 @@ class AdvisorViewProblem extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'No attachment yet...',
                     style: TextStyle(fontStyle: FontStyle.italic),
                   ),
-                  TextButton(onPressed: () {}, child: Text('Ask for evidence'))
+                  TextButton(
+                      onPressed: () {}, child: const Text('Ask for evidence'))
                 ],
               ),
             ),
@@ -92,7 +93,7 @@ class AdvisorViewProblem extends StatelessWidget {
                         child: Container(
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
+                          child: const Text(
                             'Message',
                             style: TextStyle(
                               color: Colors.white,
@@ -102,7 +103,7 @@ class AdvisorViewProblem extends StatelessWidget {
                         ),
                       ),
                     ),
-                    VerticalDivider(
+                    const VerticalDivider(
                       color: Colors.white,
                       thickness: 1,
                     ),
@@ -112,7 +113,7 @@ class AdvisorViewProblem extends StatelessWidget {
                         child: Container(
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
+                          child: const Text(
                             'Ask for Feedback',
                             style: TextStyle(
                               color: Colors.white,

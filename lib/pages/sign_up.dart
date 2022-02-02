@@ -310,7 +310,7 @@ class _SecondFormState extends State<SecondForm> {
 
   _getImage() {
     if (image != null) return FileImage(File(image!.path));
-    return AssetImage('assets/logo/unknown.png');
+    return const AssetImage('assets/logo/unknown.png');
   }
 
   @override
@@ -396,7 +396,7 @@ class _SecondFormState extends State<SecondForm> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 7,
                 ),
                 Expanded(
@@ -435,7 +435,7 @@ class _SecondFormState extends State<SecondForm> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Choose Photo From'),
-        content: Container(
+        content: SizedBox(
           width: 100,
           height: 100,
           child: Column(

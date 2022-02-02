@@ -80,6 +80,9 @@ class _SignInState extends State<SignIn> {
                       const SizedBox(height: 22),
                       SizedBox(
                         child: TextFormField(
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
                           decoration: InputDecoration(
                             labelText: 'Password',
                             focusedBorder: WidgetStyleConstant.textFormField(),
