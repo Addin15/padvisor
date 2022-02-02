@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "767636955855",
+    "project_id": "padvisor-36d5d",
+    "storage_bucket": "padvisor-36d5d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767636955855:android:06b0b0473281328ba4cdba",
+        "android_client_info": {
+          "package_name": "com.project.padvisor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767636955855-jlrssg40moontuu2gm12eejmn2r07htc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.padvisor",
+            "certificate_hash": "695f7d77fca288c74ab7508a6f0743cb1c65a23b"
+          }
+        },
+        {
+          "client_id": "767636955855-fbnn4pout86ap1p3659sjr4ii4nao0u2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHTTbEmkSf8gWBvMze1gyrCcgf1mNod74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767636955855-fbnn4pout86ap1p3659sjr4ii4nao0u2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

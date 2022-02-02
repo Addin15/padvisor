@@ -59,7 +59,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - assets/logo/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -73,13 +73,13 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-     - family: Reem Kufi
-       fonts:
-         - asset: assets/fonts/ReemKufi-Bold.ttf
-         - asset: assets/fonts/ReemKufi-Medium.ttf
-         - asset: assets/fonts/ReemKufi-Regular.ttf
-         - asset: assets/fonts/ReemKufi-SemiBold.ttf
-         - asset: assets/fonts/ReemKufi-VariableFont_wght.ttf
+  - family: Reem Kufi
+    fonts:
+      - asset: assets/fonts/ReemKufi-Bold.ttf
+      - asset: assets/fonts/ReemKufi-Medium.ttf
+      - asset: assets/fonts/ReemKufi-Regular.ttf
+      - asset: assets/fonts/ReemKufi-SemiBold.ttf
+      - asset: assets/fonts/ReemKufi-VariableFont_wght.ttf
   
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
