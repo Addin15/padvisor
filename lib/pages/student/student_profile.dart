@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/shared/color_constant.dart';
-import 'package:padvisor/shared/user.dart';
 
 class StudentProfile extends StatefulWidget {
   const StudentProfile({Key? key}) : super(key: key);
@@ -11,17 +10,20 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-  final User = UserPreferences.myUser;
-
   bool showPassword = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
+        centerTitle: true,
+        title: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset('assets/logo/logo_white.png'),
+          child: Image.asset(
+            'assets/logo/logo_white.png',
+            width: 30,
+            height: 30,
+          ),
         ),
         elevation: 0.0,
         backgroundColor: AppColor.primaryColor,
@@ -49,25 +51,26 @@ class _StudentProfileState extends State<StudentProfile> {
                 height: 15,
               ),
               ProfileWidget(
-                imagePath: User.imagePath,
+                imagePath: 'imagePath',
                 onClicked: () async {},
               ),
               const SizedBox(
                 height: 24,
               ),
-              buildTextField("Full Name", User.name, false),
+              buildTextField("Full Name", 'name', false),
               const SizedBox(height: 10),
-              buildTextField("Matric Number", User.matricno, false),
+              buildTextField("Matric Number", 'matricno', false),
               const SizedBox(height: 10),
-              buildTextField("Email", User.email, false),
+              buildTextField("Email", 'email', false),
               const SizedBox(height: 10),
-              buildTextField("Password", User.password, true),
+              buildTextField("Password", '*******', true),
               const SizedBox(height: 10),
-              buildTextField("WhatsApp", User.whatsapp, false),
+              buildTextField("WhatsApp", 'whatsapp', false),
               const SizedBox(height: 10),
-              buildTextField("WeChat", User.wechat, false),
+              buildTextField("WeChat", 'wechat', false),
               const SizedBox(height: 10),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -86,6 +89,7 @@ class _StudentProfileState extends State<StudentProfile> {
                       ),
                     ),
                   ),
+                  SizedBox(width: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: AppColor.tertiaryColor,
@@ -95,7 +99,7 @@ class _StudentProfileState extends State<StudentProfile> {
                     ),
                     onPressed: () {},
                     child: Text(
-                      'Saved',
+                      'Save',
                       style: TextStyle(
                         fontSize: 14,
                         letterSpacing: 2.2,

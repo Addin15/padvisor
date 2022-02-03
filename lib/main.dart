@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'pages/advisor/advisor_dashboard.dart';
 import 'pages/coordinator/coordinator_dashboard.dart';
@@ -7,7 +8,9 @@ import 'pages/sign_in.dart';
 import 'pages/sign_up.dart';
 import 'pages/student/student_dashboard.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

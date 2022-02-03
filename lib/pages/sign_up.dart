@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:padvisor/pages/model/user.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:padvisor/shared/constant_styles.dart';
+import 'services/auth.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -117,6 +120,11 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
   }
 }
 
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
+final TextEditingController _nameController = TextEditingController();
+final TextEditingController _matricNoController = TextEditingController();
+
 class FirstForm extends StatefulWidget {
   const FirstForm(this._tabController, {Key? key}) : super(key: key);
 
@@ -128,10 +136,7 @@ class FirstForm extends StatefulWidget {
 
 class _FirstFormState extends State<FirstForm> {
   final formKey = GlobalKey<FormState>();
-  String name = '';
-  String email = '';
-  String matricno = '';
-  String password = '';
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +149,7 @@ class _FirstFormState extends State<FirstForm> {
           ),
           SizedBox(
             child: TextFormField(
+              controller: _nameController,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(10),
                 labelText: 'Name',
@@ -159,12 +165,12 @@ class _FirstFormState extends State<FirstForm> {
                   return null;
                 }
               },
-              onSaved: (value) => setState(() => name = value!),
             ),
           ),
           const SizedBox(height: 22),
           SizedBox(
             child: TextFormField(
+              controller: _matricNoController,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(10),
                 labelText: 'Matric Number',
@@ -180,36 +186,12 @@ class _FirstFormState extends State<FirstForm> {
                   return null;
                 }
               },
-              onSaved: (value) => setState(() => matricno = value!),
             ),
           ),
           const SizedBox(height: 22),
           SizedBox(
             child: TextFormField(
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.all(10),
-                labelText: 'Password',
-                focusedBorder: WidgetStyleConstant.textFormField(),
-                enabledBorder: WidgetStyleConstant.textFormField(),
-                errorBorder:
-                    WidgetStyleConstant.textFormField(color: Colors.red),
-              ),
-              validator: (value) {
-                if (value!.length < 7) {
-                  return 'Password must be at least 7 characters long';
-                } else {
-                  return null;
-                }
-              },
-              onSaved: (value) => setState(() => password = value!),
-            ),
-          ),
-          const SizedBox(height: 22),
-          SizedBox(
-            child: TextFormField(
+              controller: _emailController,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(10),
                 labelText: 'Email',
@@ -229,12 +211,35 @@ class _FirstFormState extends State<FirstForm> {
                   return null;
                 }
               },
-              onSaved: (value) => setState(() => email = value!),
+            ),
+          ),
+          const SizedBox(height: 22),
+          SizedBox(
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.all(10),
+                labelText: 'Password',
+                focusedBorder: WidgetStyleConstant.textFormField(),
+                enabledBorder: WidgetStyleConstant.textFormField(),
+                errorBorder:
+                    WidgetStyleConstant.textFormField(color: Colors.red),
+              ),
+              validator: (value) {
+                if (value!.length < 7) {
+                  return 'Password must be at least 7 characters long';
+                } else {
+                  return null;
+                }
+              },
             ),
           ),
           const SizedBox(height: 22),
           InkWell(
-            onTap: () {
+            onTap: () async {
               final isValid = formKey.currentState!.validate();
               if (isValid) {
                 formKey.currentState!.save();
@@ -277,6 +282,7 @@ class SecondForm extends StatefulWidget {
 
 class _SecondFormState extends State<SecondForm> {
   File? image;
+  final AuthService _auth = AuthService();
 
   Future pickImageCamera() async {
     try {
@@ -322,23 +328,26 @@ class _SecondFormState extends State<SecondForm> {
           const SizedBox(
             height: 10.0,
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: Material(
-              type: MaterialType.transparency,
-              color: Colors.transparent,
-              child: Ink(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: InkWell(
-                  onTap: () async {
-                    await openDialog();
-                  },
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.white,
-                    backgroundImage: _getImage(),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 60),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: Material(
+                type: MaterialType.transparency,
+                color: Colors.transparent,
+                child: Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: InkWell(
+                    onTap: () async {
+                      await openDialog();
+                    },
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      backgroundImage: _getImage(),
+                    ),
                   ),
                 ),
               ),
@@ -401,11 +410,21 @@ class _SecondFormState extends State<SecondForm> {
                 ),
                 Expanded(
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignIn()));
+                    onTap: () async {
+                      dynamic result = await _auth.registerWithEmailAndPassword(
+                          _emailController.text, _passwordController.text);
+
+                      if (result != null) {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc((result as Users).uid)
+                            .set({
+                          'name': _nameController.text,
+                          'matricNo': _matricNoController.text,
+                        });
+                      }
+                      print(_emailController.text);
+                      print(_passwordController.text);
                     },
                     child: Container(
                       alignment: Alignment.center,
@@ -463,10 +482,12 @@ class _SecondFormState extends State<SecondForm> {
       ),
     );
 
-    if (val['type'] == 0) {
-      await pickImageCamera();
-    } else if (val['type'] == 1) {
-      await pickImageGallery();
+    if (val != null) {
+      if (val['type'] == 0) {
+        await pickImageCamera();
+      } else if (val['type'] == 1) {
+        await pickImageGallery();
+      }
     }
   }
 }

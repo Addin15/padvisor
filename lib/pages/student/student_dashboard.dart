@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
 import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
@@ -44,7 +45,7 @@ class _StudentDashboardState extends State<StudentDashboard>
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
+        padding: const EdgeInsets.only(left: 5, right: 5, top: 10),
         child: Column(
           children: [
             TabBar(
@@ -59,20 +60,27 @@ class _StudentDashboardState extends State<StudentDashboard>
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black,
               tabs: const [
-                Tab(text: 'Feedback'),
-                Tab(text: 'Problems'),
-                Tab(text: 'Annoucement'),
+                Tab(icon: Icon(Icons.star_outline), text: 'Feedback'),
+                Tab(
+                    icon: Icon(Icons.report_problem_outlined),
+                    text: 'Problems'),
+                Tab(
+                    icon: Icon(Icons.announcement_outlined),
+                    text: 'Annoucement'),
               ],
             ),
             const SizedBox(height: 15),
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: const [
-                  Feedback(),
-                  Problems(),
-                  Annoucement(),
-                ],
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: const [
+                    Feedback(),
+                    Problems(),
+                    Annoucement(),
+                  ],
+                ),
               ),
             ),
           ],
@@ -98,16 +106,7 @@ class _Annoucement extends State<Annoucement> {
         Expanded(
             child: ListView.separated(
                 itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const StudentAnnoucement()));
-                    },
-                    child: Container(
-                      height: 90,
+                  return Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -116,25 +115,18 @@ class _Annoucement extends State<Annoucement> {
                         ),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: const [
-                            Expanded(
-                              child: Text(
-                                'Latest Annoucement',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
+                      child: ExpansionTile(
+                        title: Row(
+                          children: [
+                            Expanded(child: Text('adiin bajingan')),
+                            Text(DateFormat('dd/MM/yyyy')
+                                .format(DateTime.now())),
                           ],
                         ),
-                      ),
-                    ),
-                  );
+                        children: [
+                          Text('details'),
+                        ],
+                      ));
                 },
                 separatorBuilder: (context, index) {
                   return const SizedBox(height: 15);

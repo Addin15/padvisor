@@ -58,6 +58,7 @@ class _SignInState extends State<SignIn> {
                         child: TextFormField(
                           decoration: InputDecoration(
                             labelText: 'Email',
+                            contentPadding: const EdgeInsets.all(10),
                             focusedBorder: WidgetStyleConstant.textFormField(),
                             enabledBorder: WidgetStyleConstant.textFormField(),
                             errorBorder: WidgetStyleConstant.textFormField(
@@ -69,7 +70,7 @@ class _SignInState extends State<SignIn> {
                             final regExp = RegExp(pattern);
 
                             if (!regExp.hasMatch(value!)) {
-                              return 'Enter a valid email';
+                              return 'Incorrect email';
                             } else {
                               return null;
                             }
@@ -84,6 +85,7 @@ class _SignInState extends State<SignIn> {
                           enableSuggestions: false,
                           autocorrect: false,
                           decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.all(10),
                             labelText: 'Password',
                             focusedBorder: WidgetStyleConstant.textFormField(),
                             enabledBorder: WidgetStyleConstant.textFormField(),
