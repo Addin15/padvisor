@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
 import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
+import 'package:padvisor/pages/student/student_profile.dart';
 import 'package:padvisor/shared/color_constant.dart';
 
 class StudentDashboard extends StatefulWidget {
@@ -32,7 +33,14 @@ class _StudentDashboardState extends State<StudentDashboard>
         elevation: 0.0,
         backgroundColor: AppColor.primaryColor,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.person)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const StudentProfile()));
+              },
+              icon: const Icon(Icons.person)),
         ],
       ),
       body: Container(
