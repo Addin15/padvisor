@@ -173,7 +173,7 @@ class _ProblemPageState extends State<ProblemPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'Student Name',
                             style: TextStyle(
@@ -185,15 +185,15 @@ class _ProblemPageState extends State<ProblemPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text('Low Attendance'),
+                            const Text('Low Attendance'),
                             const SizedBox(width: 8),
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.green,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 3.0,
                                 ),
@@ -233,12 +233,12 @@ class _StudentListState extends State<StudentList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        CupertinoSearchTextField(),
+        const CupertinoSearchTextField(),
         Expanded(
           child: ListView.separated(
             itemCount: 4,
             separatorBuilder: (context, index) {
-              return index == 4 ? SizedBox.shrink() : Divider();
+              return index == 4 ? const SizedBox.shrink() : const Divider();
             },
             itemBuilder: (context, index) {
               return Container(
@@ -246,12 +246,12 @@ class _StudentListState extends State<StudentList> {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 0),
                 child: ListTile(
-                  leading: CircleAvatar(),
-                  title: Text('Student Name'),
-                  subtitle: Text('Student Year'),
+                  leading: const CircleAvatar(),
+                  title: const Text('Student Name'),
+                  subtitle: const Text('Student Year'),
                   trailing: IconButton(
                     onPressed: () {},
-                    icon: Icon(Icons.more_vert_outlined),
+                    icon: const Icon(Icons.more_vert_outlined),
                   ),
                 ),
               );
