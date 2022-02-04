@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_up.dart';
 import 'package:padvisor/pages/student/student_dashboard.dart';
 
@@ -14,8 +15,10 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   final formKey = GlobalKey<FormState>();
+  final AuthService _auth = AuthService();
   String email = '';
   String password = '';
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +78,7 @@ class _SignInState extends State<SignIn> {
                               return null;
                             }
                           },
-                          onSaved: (value) => setState(() => email = value!),
+                          onChanged: (value) => setState(() => email = value),
                         ),
                       ),
                       const SizedBox(height: 22),
@@ -99,7 +102,8 @@ class _SignInState extends State<SignIn> {
                               return null;
                             }
                           },
-                          onSaved: (value) => setState(() => password = value!),
+                          onChanged: (value) =>
+                              setState(() => password = value),
                         ),
                       ),
                       TextButton(
@@ -107,14 +111,22 @@ class _SignInState extends State<SignIn> {
                         child: const Text('Forgot Password?'),
                       ),
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
                           final isValid = formKey.currentState!.validate();
                           if (isValid) {
+                            dynamic result = await _auth
+                                .signInWithEmailAndPassword(email, password);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         const StudentDashboard()));
+                            if (result == null) {
+                              setState(() {
+                                error =
+                                    'could not sign in with those credentials';
+                              });
+                            }
                           }
                         },
                         child: Container(

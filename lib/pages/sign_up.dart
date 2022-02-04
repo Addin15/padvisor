@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -136,7 +137,6 @@ class FirstForm extends StatefulWidget {
 
 class _FirstFormState extends State<FirstForm> {
   final formKey = GlobalKey<FormState>();
-  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -170,6 +170,7 @@ class _FirstFormState extends State<FirstForm> {
           const SizedBox(height: 22),
           SizedBox(
             child: TextFormField(
+              keyboardType: TextInputType.number,
               controller: _matricNoController,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(10),
@@ -282,17 +283,20 @@ class SecondForm extends StatefulWidget {
 
 class _SecondFormState extends State<SecondForm> {
   File? image;
+  final imagePicker = ImagePicker();
+  String? downloadURL;
   final AuthService _auth = AuthService();
+  final TextEditingController _whatsAppNumber = TextEditingController();
+  final TextEditingController _weChatId = TextEditingController();
 
   Future pickImageCamera() async {
     try {
-      final XFile? pickedImage =
+      final pickedImage =
           await ImagePicker().pickImage(source: ImageSource.camera);
       if (pickedImage == null) return;
 
-      final imageTemporary = File(pickedImage.path);
       setState(() {
-        image = imageTemporary;
+        image = File(pickedImage.path);
       });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
@@ -301,13 +305,12 @@ class _SecondFormState extends State<SecondForm> {
 
   Future pickImageGallery() async {
     try {
-      final XFile? pickedImage =
+      final pickedImage =
           await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedImage == null) return;
 
-      final imageTemporary = File(pickedImage.path);
       setState(() {
-        image = imageTemporary;
+        image = File(pickedImage.path);
       });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
@@ -317,6 +320,13 @@ class _SecondFormState extends State<SecondForm> {
   _getImage() {
     if (image != null) return FileImage(File(image!.path));
     return const AssetImage('assets/logo/unknown.png');
+  }
+
+  Future uploadImage() async {
+    Reference ref = FirebaseStorage.instance.ref().child("images");
+    await ref.putFile(image!);
+    downloadURL = await ref.getDownloadURL();
+    print(downloadURL);
   }
 
   @override
@@ -357,21 +367,51 @@ class _SecondFormState extends State<SecondForm> {
             height: 20,
           ),
           SizedBox(
-            child: TextFormField(
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.all(10),
-                focusedBorder: WidgetStyleConstant.textFormField(),
-                enabledBorder: WidgetStyleConstant.textFormField(),
-              ),
+            child: Column(
+              children: [
+                TextFormField(
+                    controller: _whatsAppNumber,
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Image.asset(
+                          'assets/logo/WhatsApp.png',
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.all(10),
+                      labelText: 'WhatsApp Number',
+                      focusedBorder: WidgetStyleConstant.textFormField(),
+                      enabledBorder: WidgetStyleConstant.textFormField(),
+                      errorBorder:
+                          WidgetStyleConstant.textFormField(color: Colors.red),
+                    ),
+                    keyboardType: TextInputType.number),
+              ],
             ),
           ),
           const SizedBox(height: 22),
           SizedBox(
             child: TextFormField(
+              controller: _weChatId,
               decoration: InputDecoration(
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Image.asset(
+                    'assets/logo/WeChat.png',
+                    width: 20,
+                    height: 20,
+                    fit: BoxFit.fill,
+                  ),
+                ),
                 contentPadding: const EdgeInsets.all(10),
+                labelText: 'WeChat id',
                 focusedBorder: WidgetStyleConstant.textFormField(),
                 enabledBorder: WidgetStyleConstant.textFormField(),
+                errorBorder:
+                    WidgetStyleConstant.textFormField(color: Colors.red),
               ),
             ),
           ),
@@ -421,10 +461,18 @@ class _SecondFormState extends State<SecondForm> {
                             .set({
                           'name': _nameController.text,
                           'matricNo': _matricNoController.text,
+                          'weChat': _weChatId.text,
+                          'whatsApp': _whatsAppNumber.text
                         });
+
+                        uploadImage();
+                        print(downloadURL);
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignIn()));
                       }
-                      print(_emailController.text);
-                      print(_passwordController.text);
                     },
                     child: Container(
                       alignment: Alignment.center,
