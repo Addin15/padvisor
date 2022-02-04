@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:padvisor/pages/hod/create_announcement.dart';
+import 'package:provider/provider.dart';
 
 import '../../shared/color_constant.dart';
+import '../services/database.dart';
+import '../model/announcement.dart';
 
 class HodDashboard extends StatefulWidget {
   const HodDashboard({Key? key}) : super(key: key);
@@ -59,7 +63,7 @@ class _HodDashboardState extends State<HodDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  Announcement(),
+                  ViewAnnouncement(),
                   StudentList(),
                 ],
               ),
@@ -71,58 +75,94 @@ class _HodDashboardState extends State<HodDashboard>
   }
 }
 
-class Announcement extends StatefulWidget {
-  const Announcement({Key? key}) : super(key: key);
+class ViewAnnouncement extends StatefulWidget {
+  const ViewAnnouncement({Key? key}) : super(key: key);
 
   @override
-  _AnnouncementState createState() => _AnnouncementState();
+  _ViewAnnouncementState createState() => _ViewAnnouncementState();
 }
 
-class _AnnouncementState extends State<Announcement> {
+class _ViewAnnouncementState extends State<ViewAnnouncement> {
+  DatabaseService db = DatabaseService();
+  String? _selectedCohort = '';
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Column(
-          children: [
-            Row(
-              children: [
-                Text('Cohort: '),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: DropdownButtonFormField(
-                    value: '2019/2020',
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('2019/2020'),
-                        value: '2019/2020',
-                      ),
-                      DropdownMenuItem(
-                        child: Text('2020/2021'),
-                        value: 2020 / 2021,
-                      ),
-                    ],
+        FutureBuilder(
+            future: db.getCohorts(),
+            builder: (context, AsyncSnapshot<List<String>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  // backgroundColor: Colors.white,
+                  body: SpinKitThreeInOut(
+                    color: AppColor.tertiaryColor,
                   ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.separated(
-                itemCount: 20,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  return ExpansionTile(
-                    title: Text('Announcement'),
-                    children: [
-                      Text('Details'),
-                      Text('Details'),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                );
+              } else {
+                List<String>? cohorts = snapshot.data;
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text('Cohort: '),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: DropdownButtonFormField(
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCohort = value.toString();
+                              });
+                            },
+                            value: _selectedCohort!.isEmpty
+                                ? cohorts!.elementAt(0)
+                                : _selectedCohort,
+                            items: [
+                              ...cohorts!
+                                  .map((cohort) => DropdownMenuItem(
+                                        child: Text(cohort),
+                                        value: cohort,
+                                      ))
+                                  .toList(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: StreamProvider<List<Announcement>>.value(
+                        value: db.getAnnouncements(_selectedCohort!.isEmpty
+                            ? cohorts.elementAt(0)
+                            : _selectedCohort),
+                        initialData: const [],
+                        builder: (context, _) {
+                          List<Announcement> announcements =
+                              Provider.of<List<Announcement>>(context);
+
+                          return ListView.separated(
+                            itemCount: announcements.length,
+                            separatorBuilder: (context, index) =>
+                                SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              return ExpansionTile(
+                                title:
+                                    Text(announcements.elementAt(index).title!),
+                                children: [
+                                  Text(announcements
+                                      .elementAt(index)
+                                      .announcement!),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }
+            }),
         Positioned(
           bottom: 20,
           right: 0,
