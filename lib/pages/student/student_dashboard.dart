@@ -4,6 +4,7 @@ import 'package:padvisor/pages/student/student_add_report.dart';
 import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/pages/student/student_profile.dart';
+import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
 
 class StudentDashboard extends StatefulWidget {
@@ -118,9 +119,23 @@ class _Annoucement extends State<Annoucement> {
                       child: ExpansionTile(
                         title: Row(
                           children: [
-                            Expanded(child: Text('adiin bajingan')),
-                            Text(DateFormat('dd/MM/yyyy')
-                                .format(DateTime.now())),
+                            Expanded(
+                              child: Text(
+                                'adin bajingan',
+                                style: TextStyle(
+                                    color: AppColor.tertiaryColor,
+                                    fontSize: 18.0,
+                                    fontFamily: "Reem Kufi"),
+                              ),
+                            ),
+                            Text(
+                                DateFormat('dd/MM/yyyy').format(
+                                  DateTime.now(),
+                                ),
+                                style: TextStyle(
+                                    color: AppColor.tertiaryColor,
+                                    fontSize: 14.0,
+                                    fontFamily: "Reem Kufi")),
                           ],
                         ),
                         children: [
@@ -131,7 +146,7 @@ class _Annoucement extends State<Annoucement> {
                 separatorBuilder: (context, index) {
                   return const SizedBox(height: 15);
                 },
-                itemCount: 5))
+                itemCount: 2))
       ],
     );
   }
@@ -151,72 +166,87 @@ class _Problems extends State<Problems> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AddReport()));
-                    },
-                    child: Container(
-                      height: 90,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.primaryColor,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
+          child: ListView.separated(
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const UploadDoc()));
+                  },
+                  child: Container(
+                    height: 90,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: AppColor.primaryColor,
+                        width: 2,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Low Attendance',
-                                style: TextStyle(
-                                  fontSize: 22,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Low Attendance',
+                              style: TextStyle(
+                                  color: AppColor.tertiaryColor,
+                                  fontSize: 18.0,
+                                  fontFamily: "Reem Kufi"),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.yellow[900],
                                 ),
-                                textAlign: TextAlign.start,
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 3.0,
+                                  ),
+                                  child: Text(
+                                    'Pending',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.yellow[900],
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 3.0,
-                                    ),
-                                    child: Text(
-                                      'Pending',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 15);
-                },
-                itemCount: 5))
+                  ),
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const SizedBox(height: 15);
+              },
+              itemCount: 3),
+        ),
+        Container(
+          padding: EdgeInsets.all(20),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddReport()),
+              );
+            },
+            backgroundColor: AppColor.primaryColor,
+            child: Icon(Icons.add),
+          ),
+        ),
       ],
     );
   }
@@ -264,8 +294,9 @@ class _Feedback extends State<Feedback> {
                               child: Text(
                                 'Low Grades',
                                 style: TextStyle(
-                                  fontSize: 22,
-                                ),
+                                    color: AppColor.tertiaryColor,
+                                    fontSize: 18.0,
+                                    fontFamily: "Reem Kufi"),
                                 textAlign: TextAlign.start,
                               ),
                             ),
@@ -301,7 +332,7 @@ class _Feedback extends State<Feedback> {
                 separatorBuilder: (context, index) {
                   return const SizedBox(height: 15);
                 },
-                itemCount: 5))
+                itemCount: 2))
       ],
     );
   }

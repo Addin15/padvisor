@@ -323,9 +323,11 @@ class _SecondFormState extends State<SecondForm> {
   }
 
   Future uploadImage() async {
-    Reference ref = FirebaseStorage.instance.ref().child("images");
-    await ref.putFile(image!);
-    downloadURL = await ref.getDownloadURL();
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("image/${DateTime.now().millisecondsSinceEpoch.toString()}");
+    TaskSnapshot taskSnapshot = await ref.putFile(image!);
+    downloadURL = await taskSnapshot.ref.getDownloadURL();
     print(downloadURL);
   }
 
@@ -455,6 +457,8 @@ class _SecondFormState extends State<SecondForm> {
                           _emailController.text, _passwordController.text);
 
                       if (result != null) {
+                        await uploadImage();
+
                         await FirebaseFirestore.instance
                             .collection('users')
                             .doc((result as Users).uid)
@@ -462,12 +466,10 @@ class _SecondFormState extends State<SecondForm> {
                           'name': _nameController.text,
                           'matricNo': _matricNoController.text,
                           'weChat': _weChatId.text,
-                          'whatsApp': _whatsAppNumber.text
+                          'whatsApp': _whatsAppNumber.text,
+                          'type': 'student',
+                          'url': downloadURL,
                         });
-
-                        uploadImage();
-                        print(downloadURL);
-
                         Navigator.push(
                             context,
                             MaterialPageRoute(

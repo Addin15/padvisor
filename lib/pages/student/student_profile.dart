@@ -61,10 +61,6 @@ class _StudentProfileState extends State<StudentProfile> {
               const SizedBox(height: 10),
               buildTextField("Matric Number", 'matricno', false),
               const SizedBox(height: 10),
-              buildTextField("Email", 'email', false),
-              const SizedBox(height: 10),
-              buildTextField("Password", '*******', true),
-              const SizedBox(height: 10),
               buildTextField("WhatsApp", 'whatsapp', false),
               const SizedBox(height: 10),
               buildTextField("WeChat", 'wechat', false),
@@ -138,10 +134,9 @@ class _StudentProfileState extends State<StudentProfile> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: placeholder,
         hintStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+            color: AppColor.tertiaryColor,
+            fontSize: 18.0,
+            fontFamily: "Reem Kufi"),
       ),
     );
   }
