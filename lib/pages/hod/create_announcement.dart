@@ -58,60 +58,69 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                   )
                 ],
               ),
-              body: Container(
-                padding: const EdgeInsets.only(right: 30, left: 30, top: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Cohort: '),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCohort = value.toString();
-                              });
-                            },
-                            value: _selectedCohort!.isEmpty
-                                ? cohorts!.elementAt(0)
-                                : _selectedCohort,
-                            items: [
-                              ...cohorts!
-                                  .map((cohort) => DropdownMenuItem(
-                                        child: Text(cohort),
-                                        value: cohort,
-                                      ))
-                                  .toList(),
+              body: snapshot.data!.isEmpty
+                  ? Center(
+                      child: Text('No cohorts found'),
+                    )
+                  : Container(
+                      padding:
+                          const EdgeInsets.only(right: 30, left: 30, top: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text('Cohort: '),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: DropdownButtonFormField(
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedCohort = value.toString();
+                                    });
+                                  },
+                                  value: _selectedCohort!.isEmpty
+                                      ? cohorts!.elementAt(0)
+                                      : _selectedCohort,
+                                  items: [
+                                    ...cohorts!
+                                        .map((cohort) => DropdownMenuItem(
+                                              child: Text(cohort),
+                                              value: cohort,
+                                            ))
+                                        .toList(),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text('Title:'),
-                    const SizedBox(height: 5),
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        enabledBorder: WidgetStyleConstant.textFormField(),
-                        focusedBorder: WidgetStyleConstant.textFormField(),
+                          const SizedBox(height: 10),
+                          Text('Title:'),
+                          const SizedBox(height: 5),
+                          TextFormField(
+                            controller: _titleController,
+                            decoration: InputDecoration(
+                              enabledBorder:
+                                  WidgetStyleConstant.textFormField(),
+                              focusedBorder:
+                                  WidgetStyleConstant.textFormField(),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text('Announcement'),
+                          const SizedBox(height: 5),
+                          TextFormField(
+                            controller: _announcementController,
+                            decoration: InputDecoration(
+                              enabledBorder:
+                                  WidgetStyleConstant.textFormField(),
+                              focusedBorder:
+                                  WidgetStyleConstant.textFormField(),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text('Announcement'),
-                    const SizedBox(height: 5),
-                    TextFormField(
-                      controller: _announcementController,
-                      decoration: InputDecoration(
-                        enabledBorder: WidgetStyleConstant.textFormField(),
-                        focusedBorder: WidgetStyleConstant.textFormField(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             );
           }
         });

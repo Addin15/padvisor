@@ -43,4 +43,15 @@ class DatabaseService {
     return snapshots.docs.map((doc) => doc.id).toList();
   }
   //---------------------------- HEAD OF DEPARTMENT --------------------------------//
+  //---------------------------- PA COORDINATOR --------------------------------//
+
+  Future<void> addCohort(String cohort) async {
+    try {
+      await db.collection('cohorts').doc(cohort).set({});
+    } catch (e) {
+      e.hashCode;
+    }
+  }
+
+  //---------------------------- PA COORDINATOR --------------------------------//
 }

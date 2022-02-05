@@ -101,66 +101,72 @@ class _ViewAnnouncementState extends State<ViewAnnouncement> {
                   ),
                 );
               } else {
-                List<String>? cohorts = snapshot.data;
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text('Cohort: '),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCohort = value.toString();
-                              });
-                            },
-                            value: _selectedCohort!.isEmpty
-                                ? cohorts!.elementAt(0)
-                                : _selectedCohort,
-                            items: [
-                              ...cohorts!
-                                  .map((cohort) => DropdownMenuItem(
-                                        child: Text(cohort),
-                                        value: cohort,
-                                      ))
-                                  .toList(),
-                            ],
+                if (snapshot.data!.isNotEmpty) {
+                  List<String>? cohorts = snapshot.data;
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text('Cohort: '),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: DropdownButtonFormField(
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCohort = value.toString();
+                                });
+                              },
+                              value: _selectedCohort!.isEmpty
+                                  ? cohorts!.elementAt(0)
+                                  : _selectedCohort,
+                              items: [
+                                ...cohorts!
+                                    .map((cohort) => DropdownMenuItem(
+                                          child: Text(cohort),
+                                          value: cohort,
+                                        ))
+                                    .toList(),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: StreamProvider<List<Announcement>>.value(
-                        value: db.getAnnouncements(_selectedCohort!.isEmpty
-                            ? cohorts.elementAt(0)
-                            : _selectedCohort),
-                        initialData: const [],
-                        builder: (context, _) {
-                          List<Announcement> announcements =
-                              Provider.of<List<Announcement>>(context);
-
-                          return ListView.separated(
-                            itemCount: announcements.length,
-                            separatorBuilder: (context, index) =>
-                                SizedBox(height: 10),
-                            itemBuilder: (context, index) {
-                              return ExpansionTile(
-                                title:
-                                    Text(announcements.elementAt(index).title!),
-                                children: [
-                                  Text(announcements
-                                      .elementAt(index)
-                                      .announcement!),
-                                ],
-                              );
-                            },
-                          );
-                        },
+                        ],
                       ),
-                    ),
-                  ],
-                );
+                      Expanded(
+                        child: StreamProvider<List<Announcement>>.value(
+                          value: db.getAnnouncements(_selectedCohort!.isEmpty
+                              ? cohorts.elementAt(0)
+                              : _selectedCohort),
+                          initialData: const [],
+                          builder: (context, _) {
+                            List<Announcement> announcements =
+                                Provider.of<List<Announcement>>(context);
+
+                            return ListView.separated(
+                              itemCount: announcements.length,
+                              separatorBuilder: (context, index) =>
+                                  SizedBox(height: 10),
+                              itemBuilder: (context, index) {
+                                return ExpansionTile(
+                                  title: Text(
+                                      announcements.elementAt(index).title!),
+                                  children: [
+                                    Text(announcements
+                                        .elementAt(index)
+                                        .announcement!),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Center(
+                    child: Text('No cohorts found'),
+                  );
+                }
               }
             }),
         Positioned(

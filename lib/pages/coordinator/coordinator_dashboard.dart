@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:padvisor/pages/coordinator/coordinator_view_cohort.dart';
 
 import '../../shared/color_constant.dart';
 import '../../shared/constant_styles.dart';
-import '../hod/create_announcement.dart';
+import '../hod/hod_dashboard.dart';
+import '../services/database.dart';
 
 class CoordinatorDashboard extends StatefulWidget {
   const CoordinatorDashboard({Key? key}) : super(key: key);
@@ -62,7 +64,7 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  Announcement(),
+                  ViewAnnouncement(),
                   Cohorts(),
                   StudentList(),
                 ],
@@ -75,80 +77,6 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
   }
 }
 
-class Announcement extends StatefulWidget {
-  const Announcement({Key? key}) : super(key: key);
-
-  @override
-  _AnnouncementState createState() => _AnnouncementState();
-}
-
-class _AnnouncementState extends State<Announcement> {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Row(
-              children: [
-                Text('Cohort: '),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: DropdownButtonFormField(
-                    value: '2019/2020',
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('2019/2020'),
-                        value: '2019/2020',
-                      ),
-                      DropdownMenuItem(
-                        child: Text('2020/2021'),
-                        value: 2020 / 2021,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.separated(
-                itemCount: 20,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  return ExpansionTile(
-                    title: Text('Announcement'),
-                    children: [
-                      Text('Details'),
-                      Text('Details'),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        Positioned(
-          bottom: 20,
-          right: 0,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CreateAnnouncement()));
-            },
-            backgroundColor: AppColor.tertiaryColor,
-            child: Icon(
-              Icons.add_outlined,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class Cohorts extends StatefulWidget {
   const Cohorts({Key? key}) : super(key: key);
 
@@ -157,6 +85,7 @@ class Cohorts extends StatefulWidget {
 }
 
 class _CohortsState extends State<Cohorts> {
+  DatabaseService db = DatabaseService();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -164,55 +93,79 @@ class _CohortsState extends State<Cohorts> {
       children: [
         InkWell(
           onTap: () {
+            TextEditingController _cohortController = TextEditingController();
+            GlobalKey<FormState> _formKey = GlobalKey<FormState>();
             showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                      title: Text('Add Cohort'),
-                      content: TextFormField(
-                        decoration: InputDecoration(
-                          enabledBorder: WidgetStyleConstant.textFormField(),
-                          focusedBorder: WidgetStyleConstant.textFormField(),
+                builder: (context) => Form(
+                      key: _formKey,
+                      child: AlertDialog(
+                        title: Text('Add Cohort'),
+                        content: TextFormField(
+                          controller: _cohortController,
+                          validator: (value) => value!.isEmpty
+                              ? 'Cohort name can\'t be empty'
+                              : null,
+                          decoration: InputDecoration(
+                            hintText: 'yyyy-yyyy',
+                            enabledBorder: WidgetStyleConstant.textFormField(),
+                            focusedBorder: WidgetStyleConstant.textFormField(),
+                          ),
                         ),
+                        actions: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 30),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: AppColor.tertiaryColor),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text(
+                                    'Cancel',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: AppColor.tertiaryColor),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 15),
+                              InkWell(
+                                onTap: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    await db.addCohort(_cohortController.text);
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 40),
+                                  decoration: BoxDecoration(
+                                    color: AppColor.tertiaryColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text(
+                                    'Done',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      actions: [
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () {},
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 50),
-                                decoration: BoxDecoration(
-                                  color: AppColor.tertiaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  'Cancel',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {},
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 50),
-                                decoration: BoxDecoration(
-                                  color: AppColor.tertiaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  'Done',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ));
+                    )).whenComplete(() {
+              setState(() {});
+            });
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
@@ -229,30 +182,53 @@ class _CohortsState extends State<Cohorts> {
         ),
         const SizedBox(height: 15),
         Expanded(
-          child: ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(height: 10),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const ViewCohort(cohort: '2019/2020')));
-                },
-                child: Container(
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColor.tertiaryColor, width: 2),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text('2019/2020'),
-                ),
-              );
-            },
-          ),
+          child: FutureBuilder(
+              future: db.getCohorts(),
+              builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                    // backgroundColor: Colors.white,
+                    body: SpinKitThreeInOut(
+                      color: AppColor.tertiaryColor,
+                    ),
+                  );
+                } else {
+                  if (snapshot.data!.isNotEmpty) {
+                    List<String>? cohorts = snapshot.data;
+                    return ListView.separated(
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 10),
+                      itemCount: cohorts!.length,
+                      itemBuilder: (context, index) {
+                        String cohort = cohorts.elementAt(index);
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewCohort(cohort: cohort)));
+                          },
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: AppColor.tertiaryColor, width: 2),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Text(cohort),
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(
+                      child: Text('No cohorts found'),
+                    );
+                  }
+                }
+              }),
         )
       ],
     );
