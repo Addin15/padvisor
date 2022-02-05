@@ -17,7 +17,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     super.initState();
   }
 
@@ -50,6 +50,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black,
               tabs: const [
+                Tab(text: 'Announcement'),
                 Tab(text: 'Problems'),
                 Tab(text: 'Students'),
               ],
@@ -59,6 +60,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: const [
+                  Announcement(),
                   ProblemPage(),
                   StudentList(),
                 ],
@@ -67,6 +69,64 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
           ],
         ),
       ),
+    );
+  }
+}
+
+class Announcement extends StatefulWidget {
+  const Announcement({Key? key}) : super(key: key);
+
+  @override
+  _AnnouncementState createState() => _AnnouncementState();
+}
+
+class _AnnouncementState extends State<Announcement> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DropdownButton(
+          value: '2018/2019',
+          items: [
+            DropdownMenuItem(
+              child: Text('2018/2019'),
+              value: '2018/2019',
+            ),
+            DropdownMenuItem(
+              child: Text('2019/2020'),
+              value: '2019/2020',
+            ),
+            DropdownMenuItem(
+              child: Text('2020/2021'),
+              value: '2020/2021',
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView.separated(
+            itemCount: 3,
+            separatorBuilder: (context, index) => SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColor.tertiaryColor.withAlpha(100),
+                  border: Border.all(
+                    color: AppColor.tertiaryColor,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  children: [
+                    Text('Date'),
+                    Text('Title'),
+                    Text('Details'),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
