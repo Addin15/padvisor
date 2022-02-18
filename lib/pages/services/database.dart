@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:padvisor/pages/model/student.dart';
 
 import '../model/announcement.dart';
 
@@ -23,6 +24,18 @@ class DatabaseService {
     } catch (e) {
       return false;
     }
+  }
+
+  //RETRIEVE PROFILE
+  Future<Students>? getUser(String? uid) async {
+    DocumentSnapshot<Map<String, dynamic>> user =
+        await db.collection('students').doc(uid).get();
+    return Students.fromJson(user.id, user.data()!);
+  }
+
+  //SAVE STUDENT
+  Future<void> saveStudent(String uid, Map<String, dynamic> data) async {
+    await db.collection('students').doc(uid).update(data);
   }
 
   // RETRIEVE ANNOUNCEMENT

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class StudentFeedback extends StatefulWidget {
   const StudentFeedback({Key? key}) : super(key: key);
@@ -12,6 +15,9 @@ class StudentFeedback extends StatefulWidget {
 
 class _StudentFeedbackState extends State<StudentFeedback> {
   var rating = 0.0;
+  AuthService authService = AuthService();
+  TextEditingController feedbackController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -94,6 +100,7 @@ class _StudentFeedbackState extends State<StudentFeedback> {
                         ],
                       ),
                       child: TextField(
+                        controller: feedbackController,
                         textInputAction: TextInputAction.newline,
                         keyboardType: TextInputType.multiline,
                         maxLines: 10,
@@ -110,7 +117,16 @@ class _StudentFeedbackState extends State<StudentFeedback> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await FirebaseFirestore.instance
+                                .collection('feedback')
+                                .doc(authService.userId)
+                                .set({
+                              'raing': rating,
+                              'matricNo': feedbackController.text,
+                            });
+                            Navigator.pop(context);
+                          },
                           label: Text(
                             'Submit',
                             style: TextStyle(

@@ -7,7 +7,9 @@ import '../shared/color_constant.dart';
 import '../shared/constant_styles.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({Key? key}) : super(key: key);
+  const SignIn({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _SignInState createState() => _SignInState();

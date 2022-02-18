@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/shared/color_constant.dart';
@@ -12,6 +14,7 @@ class AddReport extends StatefulWidget {
 
 class _AddReportState extends State<AddReport> {
   String dropdownvalue = 'Low Attendance';
+  TextEditingController _problem = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +115,7 @@ class _AddReportState extends State<AddReport> {
                           ],
                         ),
                         child: TextField(
+                          controller: _problem,
                           textInputAction: TextInputAction.newline,
                           keyboardType: TextInputType.multiline,
                           maxLines: 10,
@@ -128,7 +132,17 @@ class _AddReportState extends State<AddReport> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Map<String, dynamic> data = {
+                                "typeproblem": dropdownvalue,
+                                "problem": _problem.text
+                              };
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(AuthService().userId)
+                                  .collection("problems")
+                                  .add(data);
+                            },
                             child: Text(
                               'Report Problem',
                               style: TextStyle(
