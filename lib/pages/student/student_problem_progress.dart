@@ -1,26 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:padvisor/pages/services/auth.dart';
-import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
+import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
 
-class AddReport extends StatefulWidget {
-  const AddReport({Key? key}) : super(key: key);
+import '../sign_in.dart';
+
+class StudentProblem extends StatefulWidget {
+  const StudentProblem({Key? key}) : super(key: key);
 
   @override
-  _AddReportState createState() => _AddReportState();
+  _StudentProblemState createState() => _StudentProblemState();
 }
 
-class _AddReportState extends State<AddReport> {
-  String dropdownvalue = 'Low Attendance';
-  TextEditingController _problem = new TextEditingController();
-  String url = '';
-  String status = 'submitted';
-
+class _StudentProblemState extends State<StudentProblem> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -64,7 +58,7 @@ class _AddReportState extends State<AddReport> {
                     children: [
                       SizedBox(height: 15),
                       Text(
-                        'What is your problem?',
+                        'problem type',
                         style: TextStyle(
                           fontFamily: "Reem Kufi",
                           color: Colors.white,
@@ -74,35 +68,6 @@ class _AddReportState extends State<AddReport> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 20),
-                      DropdownButton<String>(
-                        dropdownColor: AppColor.primaryColor,
-                        value: dropdownvalue,
-                        items: <String>[
-                          'Low Attendance',
-                          'Low Grades',
-                          'Attitude Problem',
-                          'Other'
-                        ].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(
-                                fontFamily: "Reem Kufi",
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? value) {
-                          setState(() {
-                            dropdownvalue = value!;
-                          });
-                        },
-                      ),
-                      SizedBox(height: 40),
                       Container(
                         padding: EdgeInsets.all(80),
                         decoration: BoxDecoration(
@@ -117,13 +82,10 @@ class _AddReportState extends State<AddReport> {
                           ],
                         ),
                         child: TextField(
-                          controller: _problem,
-                          textInputAction: TextInputAction.newline,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 10,
+                          readOnly: true,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Write your problem here...',
+                              hintText: 'Problem details',
                               hintStyle: TextStyle(
                                 color: AppColor.primaryColor,
                               )),
@@ -135,22 +97,31 @@ class _AddReportState extends State<AddReport> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              Map<String, dynamic> data = {
-                                "typeproblem": dropdownvalue,
-                                "problem": _problem.text,
-                                "url": url,
-                                "status": status,
-                              };
-                              FirebaseFirestore.instance
-                                  .collection('problems')
-                                  .doc(AuthService().userId)
-                                  .collection('studentproblems')
-                                  .doc(Timestamp.now().toString())
-                                  .set(data);
-                              Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const UploadDoc()));
                             },
                             child: Text(
-                              'Report Problem',
+                              'Upload Report',
+                              style: TextStyle(
+                                  color: AppColor.primaryColor, fontSize: 14),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const StudentFeedback()));
+                            },
+                            child: Text(
+                              'Give Feedback',
                               style: TextStyle(
                                   color: AppColor.primaryColor, fontSize: 14),
                             ),

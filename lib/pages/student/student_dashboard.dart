@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:padvisor/pages/model/problems.dart';
+import 'package:padvisor/pages/services/auth.dart';
+import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
 import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
+import 'package:padvisor/pages/student/student_problem_progress.dart';
 import 'package:padvisor/pages/student/student_profile.dart';
 import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
+import 'package:provider/provider.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({Key? key}) : super(key: key);
@@ -17,10 +22,11 @@ class StudentDashboard extends StatefulWidget {
 class _StudentDashboardState extends State<StudentDashboard>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  DatabaseService db = DatabaseService();
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
 
@@ -60,8 +66,7 @@ class _StudentDashboardState extends State<StudentDashboard>
               ),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black,
-              tabs: const [
-                Tab(icon: Icon(Icons.star_outline), text: 'Feedback'),
+              tabs: [
                 Tab(
                     icon: Icon(Icons.report_problem_outlined),
                     text: 'Problems'),
@@ -76,9 +81,8 @@ class _StudentDashboardState extends State<StudentDashboard>
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: TabBarView(
                   controller: _tabController,
-                  children: const [
-                    Feedback(),
-                    Problems(),
+                  children: [
+                    ViewProblems(db: db),
                     Annoucement(),
                   ],
                 ),
@@ -92,7 +96,8 @@ class _StudentDashboardState extends State<StudentDashboard>
 }
 
 class Annoucement extends StatefulWidget {
-  const Annoucement({Key? key}) : super(key: key);
+  const Annoucement({Key? key, this.db}) : super(key: key);
+  final DatabaseService? db;
 
   @override
   State<Annoucement> createState() => _Annoucement();
@@ -121,17 +126,14 @@ class _Annoucement extends State<Annoucement> {
                           children: [
                             Expanded(
                               child: Text(
-                                'adin bajingan',
+                                'addin bajingan',
                                 style: TextStyle(
                                     color: AppColor.tertiaryColor,
                                     fontSize: 18.0,
                                     fontFamily: "Reem Kufi"),
                               ),
                             ),
-                            Text(
-                                DateFormat('dd/MM/yyyy').format(
-                                  DateTime.now(),
-                                ),
+                            Text('12/2/2020',
                                 style: TextStyle(
                                     color: AppColor.tertiaryColor,
                                     fontSize: 14.0,
@@ -152,188 +154,112 @@ class _Annoucement extends State<Annoucement> {
   }
 }
 
-class Problems extends StatefulWidget {
-  const Problems({Key? key}) : super(key: key);
+class ViewProblems extends StatefulWidget {
+  const ViewProblems({Key? key, this.db}) : super(key: key);
+  final DatabaseService? db;
 
   @override
-  State<Problems> createState() => _Problems();
+  State<ViewProblems> createState() => _ViewProblems();
 }
 
-class _Problems extends State<Problems> {
+class _ViewProblems extends State<ViewProblems> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: ListView.separated(
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UploadDoc()));
-                  },
-                  child: Container(
-                    height: 90,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColor.primaryColor,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Low Attendance',
-                              style: TextStyle(
-                                  color: AppColor.tertiaryColor,
-                                  fontSize: 18.0,
-                                  fontFamily: "Reem Kufi"),
-                              textAlign: TextAlign.start,
+    return StreamProvider<List<Problems>>.value(
+        value: widget.db!.getProblems(AuthService().userId),
+        initialData: const [],
+        builder: (context, child) {
+          List<Problems> problems = Provider.of<List<Problems>>(context);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      Problems problem = problems[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const StudentProblem()));
+                        },
+                        child: Container(
+                          height: 90,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColor.primaryColor,
+                              width: 2,
                             ),
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.yellow[900],
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 3.0,
-                                  ),
-                                  child: Text(
-                                    'Pending',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const SizedBox(height: 15);
-              },
-              itemCount: 3),
-        ),
-        Container(
-          padding: EdgeInsets.all(20),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddReport()),
-              );
-            },
-            backgroundColor: AppColor.primaryColor,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class Feedback extends StatefulWidget {
-  const Feedback({Key? key}) : super(key: key);
-
-  @override
-  State<Feedback> createState() => _Feedback();
-}
-
-class _Feedback extends State<Feedback> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const StudentFeedback()));
-                    },
-                    child: Container(
-                      height: 90,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.primaryColor,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Low Grades',
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 18.0,
-                                    fontFamily: "Reem Kufi"),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.green,
+                                Expanded(
+                                  child: Text(
+                                    problem.typeproblem!,
+                                    style: TextStyle(
+                                        color: AppColor.tertiaryColor,
+                                        fontSize: 18.0,
+                                        fontFamily: "Reem Kufi"),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 3.0,
-                                    ),
-                                    child: Text(
-                                      'Submited',
-                                      style: TextStyle(
-                                        color: Colors.white,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.green,
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 3.0,
+                                        ),
+                                        child: Text(
+                                          problem.status!,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 15);
-                },
-                itemCount: 2))
-      ],
-    );
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(height: 15);
+                    },
+                    itemCount: problems.length),
+              ),
+              Container(
+                padding: EdgeInsets.all(20),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddReport()),
+                    );
+                  },
+                  backgroundColor: AppColor.primaryColor,
+                  child: Icon(Icons.add),
+                ),
+              ),
+            ],
+          );
+        });
   }
 }

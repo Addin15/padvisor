@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/model/student.dart';
+import 'package:padvisor/pages/student/student_dashboard.dart';
 
 import '../model/announcement.dart';
 import '../model/advisor_advisee.dart';
@@ -19,6 +21,18 @@ class DatabaseService {
   Future<void> saveStudent(String uid, Map<String, dynamic> data) async {
     await db.collection('students').doc(uid).update(data);
   }
+
+  //STREAM PROBLEMS
+  Stream<List<Problems>>? getProblems(String? studentId) {
+    return db
+        .collection('problems')
+        .doc(studentId)
+        .collection('studentproblems')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Problems.fromJson(doc.data())).toList());
+  }
+
   //---------------------------- STUDENT -----------------------------------------//
   //---------------------------- HEAD OF DEPARTMENT --------------------------------//
 
