@@ -72,45 +72,63 @@ class DatabaseService {
   }
 
   // GET ADVISOR-ADVISEE
-  Future<List<AdvisorAdvisee>> getAdvisorAdvisee(String cohort) async {
+  // Future<Stream<List<Future<AdvisorAdvisee>>>>
+  getAdvisorAdvisee(String cohort) async {
     try {
       // DocumentSnapshot<Map<String, dynamic>> res =
       //     await db.collection('cohorts').doc(cohort).get();
       // print(res.get('reference'));
-      List<dynamic> advisoradvisee = await db
-          .collection('cohorts')
-          .doc(cohort)
-          .get()
-          .then((value) => value.get('advisors'));
+      // Map<String, dynamic> advisoradvisee = await db
+      //     .collection('cohorts')
+      //     .doc(cohort)
+      //     .get()
+      //     .then((value) => value.get('advisors'));
 
-      List<AdvisorAdvisee> advisorsAdvisees = [];
+      // List<AdvisorAdvisee> advisorsAdvisees = [];
 
-      for (Map<String, dynamic> val in advisoradvisee) {
-        DocumentReference advisor = val.entries.elementAt(0).value;
-        String advisorName =
-            await advisor.get().then((value) => value.get('name'));
+      // for (int i = 0; i < advisoradvisee.length; i++) {
+      //   Map<String, dynamic> val = advisoradvisee.values.elementAt(i);
+      //   DocumentReference advisor = val.entries.elementAt(0).value;
+      //   String advisorName =
+      //       await advisor.get().then((value) => value.get('name'));
 
-        AdvisorAdvisee a = AdvisorAdvisee(advisor.id, advisorName);
-        List<dynamic> advisees = val.entries.elementAt(1).value;
+      //   AdvisorAdvisee a = AdvisorAdvisee(advisor.id, advisorName);
+      //   List<dynamic> advisees = val.entries.elementAt(1).value;
 
-        List<Advisee> adviseesList = [];
+      //   List<Advisee> adviseesList = [];
 
-        for (DocumentReference b in advisees) {
-          String adviseeName = await b.get().then((value) => value.get('name'));
-          Advisee advisee = Advisee(b.id, adviseeName);
-          adviseesList.add(advisee);
-        }
+      //   for (DocumentReference b in advisees) {
+      //     String adviseeName = await b.get().then((value) => value.get('name'));
+      //     Advisee advisee = Advisee(b.id, adviseeName);
+      //     adviseesList.add(advisee);
+      //   }
 
-        a.setAdvisees(adviseesList);
-        advisorsAdvisees.add(a);
-      }
+      //   a.setAdvisees(adviseesList);
+      //   advisorsAdvisees.add(a);
+      // }
 
-      print(advisorsAdvisees.first.name);
+      // print(advisorsAdvisees.first.name);
 
-      return advisorsAdvisees;
+      // return advisorsAdvisees;
+      return db
+          .collection('advisors')
+          .where('cohorts', arrayContains: cohort)
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) async {
+                AdvisorAdvisee advisorAdvisee =
+                    AdvisorAdvisee(doc.id, doc.get('name'));
+                List<Advisee> advisees = await db
+                    .collection('students')
+                    .where('advisor', isEqualTo: doc.id)
+                    .snapshots()
+                    .forEach((snapshot) => snapshot.docs
+                        .map((doc) => Advisee(doc.id, doc.get('name'))));
+                advisorAdvisee.setAdvisees(advisees);
+                return advisorAdvisee;
+              }).toList());
     } catch (e) {
       print(e.toString());
-      return [];
+      return null;
     }
   }
 
