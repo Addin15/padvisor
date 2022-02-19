@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:padvisor/pages/model/user.dart';
+import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:padvisor/shared/constant_styles.dart';
@@ -284,11 +284,11 @@ class SecondForm extends StatefulWidget {
 class _SecondFormState extends State<SecondForm> {
   File? image;
   final imagePicker = ImagePicker();
-  String? downloadURL;
+  String? downloadURL = '';
   final AuthService _auth = AuthService();
   final TextEditingController _whatsAppNumber = TextEditingController();
   final TextEditingController _weChatId = TextEditingController();
-
+  final String result = '';
   Future pickImageCamera() async {
     try {
       final pickedImage =
@@ -455,19 +455,22 @@ class _SecondFormState extends State<SecondForm> {
                     onTap: () async {
                       dynamic result = await _auth.registerWithEmailAndPassword(
                           _emailController.text, _passwordController.text);
-
+                      setState(() {
+                        result = result;
+                      });
                       if (result != null) {
-                        await uploadImage();
+                        if (image != null) {
+                          await uploadImage();
+                        }
 
                         await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc((result as Users).uid)
+                            .collection('students')
+                            .doc((result as Students).uid)
                             .set({
                           'name': _nameController.text,
                           'matricNo': _matricNoController.text,
                           'weChat': _weChatId.text,
                           'whatsApp': _whatsAppNumber.text,
-                          'type': 'student',
                           'url': downloadURL,
                         });
                         Navigator.push(

@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:padvisor/pages/model/user.dart';
+import 'package:padvisor/pages/model/student.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Users? _userFromFirebase(User user) {
-    return user != null ? Users(uid: user.uid) : null;
+  Students? _userFromFirebase(User? user) {
+    return user != null ? Students(uid: user.uid) : null;
   }
+
+  get userId => _auth.currentUser!.uid;
 
   //sign in with email & password
   Future signInWithEmailAndPassword(String email, String password) async {

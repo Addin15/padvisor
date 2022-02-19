@@ -1,27 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:padvisor/pages/model/advisor_advisee.dart';
+import 'package:padvisor/pages/model/student.dart';
 
 import '../model/announcement.dart';
+import '../model/advisor_advisee.dart';
 
 class DatabaseService {
   static FirebaseFirestore db = FirebaseFirestore.instance;
 
-  // GET ADVISORS
-  Future<List<Map<String, dynamic>>> getAdvisors() async {
-    try {
-      QuerySnapshot snapshot = await db.collection('advisors').get();
-      return snapshot.docs
-          .map((doc) => {
-                'id': doc.id,
-                'name': doc.get('name'),
-              })
-          .toList();
-    } catch (e) {
-      return [];
-    }
+  //---------------------------- STUDENT -----------------------------------------//
+  //RETRIEVE PROFILE
+  Future<Students>? getUser(String? uid) async {
+    DocumentSnapshot<Map<String, dynamic>> user =
+        await db.collection('students').doc(uid).get();
+    return Students.fromJson(user.id, user.data()!);
   }
 
+  //SAVE STUDENT
+  Future<void> saveStudent(String uid, Map<String, dynamic> data) async {
+    await db.collection('students').doc(uid).update(data);
+  }
+  //---------------------------- STUDENT -----------------------------------------//
   //---------------------------- HEAD OF DEPARTMENT --------------------------------//
 
   // CREATE ANNOUNCEMENT
@@ -62,7 +60,6 @@ class DatabaseService {
   //---------------------------- HEAD OF DEPARTMENT --------------------------------//
   //---------------------------- PA COORDINATOR --------------------------------//
 
-  // ADD COHORT
   Future<void> addCohort(String cohort) async {
     try {
       await db.collection('cohorts').doc(cohort).set({});

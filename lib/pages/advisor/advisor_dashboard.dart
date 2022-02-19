@@ -101,6 +101,7 @@ class _AnnouncementState extends State<Announcement> {
               value: '2020/2021',
             ),
           ],
+          onChanged: (String? value) {},
         ),
         Expanded(
           child: ListView.separated(
