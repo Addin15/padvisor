@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:padvisor/pages/advisor/view_student.dart';
 import 'package:padvisor/pages/coordinator/coordinator_view_cohort.dart';
 import 'package:padvisor/pages/model/student.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/color_constant.dart';
@@ -21,6 +22,7 @@ class CoordinatorDashboard extends StatefulWidget {
 class _CoordinatorDashboardState extends State<CoordinatorDashboard>
     with TickerProviderStateMixin {
   TabController? _tabController;
+  AuthService auth = AuthService();
 
   @override
   void initState() {
@@ -39,6 +41,14 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
         ),
         elevation: 0.0,
         backgroundColor: AppColor.tertiaryColor,
+        actions: [
+          IconButton(
+              onPressed: () {
+                auth.signOut();
+                Navigator.pushNamed(context, 'signin');
+              },
+              icon: Icon(Icons.logout_outlined))
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
