@@ -3,6 +3,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/services/database.dart';
+import 'package:padvisor/pages/student/student_add_report.dart';
 import 'package:padvisor/pages/student/student_problem_progress.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +68,6 @@ class _ViewStudentState extends State<ViewStudent> {
   Widget build(BuildContext context) {
     DatabaseService db = DatabaseService();
     WeChatScene scene = WeChatScene.SESSION;
-    print(widget.isHod);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColor.tertiaryColor,
@@ -80,8 +80,7 @@ class _ViewStudentState extends State<ViewStudent> {
           initialData: [],
           builder: (context, snapshot) {
             List<Problems> problems = Provider.of<List<Problems>>(context);
-            // print('Problems: ${problems.length}');
-            // print(student.uid);
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -139,7 +138,15 @@ class _ViewStudentState extends State<ViewStudent> {
                           children: [
                             widget.isHod!
                                 ? TextButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => AddReport(
+                                                    idFromHod:
+                                                        widget.student.uid,
+                                                  )));
+                                    },
                                     child: Text('Report a problem'),
                                   )
                                 : SizedBox.shrink(),

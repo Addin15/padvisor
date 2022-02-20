@@ -6,7 +6,9 @@ import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/shared/color_constant.dart';
 
 class AddReport extends StatefulWidget {
-  const AddReport({Key? key}) : super(key: key);
+  const AddReport({Key? key, this.idFromHod = ''}) : super(key: key);
+
+  final String? idFromHod;
 
   @override
   _AddReportState createState() => _AddReportState();
@@ -34,14 +36,6 @@ class _AddReportState extends State<AddReport> {
         ),
         elevation: 0.0,
         backgroundColor: AppColor.primaryColor,
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const SignIn()));
-              },
-              icon: const Icon(Icons.logout_outlined)),
-        ],
       ),
       body: SingleChildScrollView(
         child: Stack(
@@ -145,7 +139,9 @@ class _AddReportState extends State<AddReport> {
                               };
                               FirebaseFirestore.instance
                                   .collection('problems')
-                                  .doc(AuthService().userId)
+                                  .doc(widget.idFromHod!.isEmpty
+                                      ? AuthService().userId
+                                      : widget.idFromHod)
                                   .collection('studentproblems')
                                   .doc(Timestamp.now().toString())
                                   .set(data);

@@ -40,6 +40,15 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
           child: Image.asset('assets/logo/logo_white.png'),
         ),
         elevation: 0.0,
+        centerTitle: true,
+        title: Column(
+          children: [
+            Text(
+              'Advisor',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+            ),
+          ],
+        ),
         backgroundColor: AppColor.tertiaryColor,
         actions: [
           IconButton(

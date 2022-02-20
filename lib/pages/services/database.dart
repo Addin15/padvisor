@@ -10,6 +10,14 @@ import '../model/advisor_advisee.dart';
 class DatabaseService {
   static FirebaseFirestore db = FirebaseFirestore.instance;
 
+  Future<String> getUserType(String id) async {
+    return await db
+        .collection('users')
+        .doc(id)
+        .get()
+        .then((value) => value.get('type'));
+  }
+
   //---------------------------- STUDENT -----------------------------------------//
   //RETRIEVE PROFILE
   Future<Students>? getUser(String? uid) async {

@@ -35,7 +35,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
     DatabaseService db = DatabaseService();
     AuthService auth = AuthService();
     return FutureBuilder(
-        future: db.advisor('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        future: db.advisor(auth.userId),
         builder: (context, AsyncSnapshot<Advisor> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SpinKitThreeInOut(
@@ -223,10 +223,12 @@ class ProblemPage extends StatefulWidget {
 }
 
 class _ProblemPageState extends State<ProblemPage> {
+  AuthService auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: widget.db!.getStudentsId('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        future: widget.db!.getStudentsId(auth.userId),
         builder: (context, AsyncSnapshot<List<String>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SpinKitThreeInOut(
@@ -358,8 +360,7 @@ class _StudentListState extends State<StudentList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future:
-            widget.db!.getStudentsUnderAdvisor('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        future: widget.db!.getStudentsUnderAdvisor(AuthService().userId),
         builder: (context, AsyncSnapshot<List<Students>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SpinKitThreeInOut(
