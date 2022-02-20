@@ -217,7 +217,9 @@ class _ViewProblems extends State<ViewProblems> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => StudentProblem(
-                                      problem.typeproblem, problem.problem)));
+                                      problem.typeproblem,
+                                      problem.problem,
+                                      problem.id)));
                         },
                         child: Container(
                           height: 90,

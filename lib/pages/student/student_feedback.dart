@@ -7,7 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StudentFeedback extends StatefulWidget {
-  const StudentFeedback({Key? key}) : super(key: key);
+  final String id;
+
+  const StudentFeedback(this.id, {Key? key}) : super(key: key);
 
   @override
   _StudentFeedbackState createState() => _StudentFeedbackState();
@@ -119,11 +121,14 @@ class _StudentFeedbackState extends State<StudentFeedback> {
                         ElevatedButton.icon(
                           onPressed: () async {
                             await FirebaseFirestore.instance
-                                .collection('feedback')
+                                .collection('problems')
                                 .doc(authService.userId)
-                                .set({
-                              'raing': rating,
-                              'matricNo': feedbackController.text,
+                                .collection('studentproblems')
+                                .doc(widget.id)
+                                .update({
+                              'rating': rating,
+                              'feedback': feedbackController.text,
+                              'needFeedback': false,
                             });
                             Navigator.pop(context);
                           },

@@ -30,8 +30,9 @@ class DatabaseService {
         .doc(studentId)
         .collection('studentproblems')
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Problems.fromJson(doc.data())).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Problems.fromJson(doc.id, doc.data()))
+            .toList());
   }
 
   //---------------------------- STUDENT -----------------------------------------//
@@ -211,8 +212,8 @@ class DatabaseService {
             .get();
 
         for (var doc in data.docs) {
-          problems
-              .add(Problems.fromJson(doc.data(), name: student.get('name')));
+          problems.add(
+              Problems.fromJson(doc.id, doc.data(), name: student.get('name')));
         }
       }
     }

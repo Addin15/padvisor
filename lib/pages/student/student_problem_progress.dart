@@ -9,8 +9,9 @@ import '../sign_in.dart';
 class StudentProblem extends StatefulWidget {
   final problem;
   final typeproblem;
-
-  StudentProblem(this.typeproblem, this.problem, {Key? key}) : super(key: key);
+  final id;
+  StudentProblem(this.typeproblem, this.problem, this.id, {Key? key})
+      : super(key: key);
 
   @override
   _StudentProblemState createState() => _StudentProblemState();
@@ -123,7 +124,7 @@ class _StudentProblemState extends State<StudentProblem> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          const StudentFeedback()));
+                                          StudentFeedback(widget.id)));
                             },
                             child: Text(
                               'Give Feedback',

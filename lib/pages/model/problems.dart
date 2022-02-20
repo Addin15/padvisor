@@ -10,19 +10,22 @@ class Problems {
   String? status;
   bool? needFeedback;
   String? feedback;
+  String? id;
 
-  Problems({
-    this.typeproblem,
-    this.studentName,
-    this.problem,
-    this.status,
-    this.url,
-    this.needFeedback,
-    this.feedback,
-  });
+  Problems(
+      {this.typeproblem,
+      this.studentName,
+      this.problem,
+      this.status,
+      this.url,
+      this.needFeedback,
+      this.feedback,
+      this.id});
 
-  Problems.fromJson(Map<String, dynamic> json, {String? name = ''})
+  Problems.fromJson(String problemId, Map<String, dynamic> json,
+      {String? name = ''})
       : studentName = name,
+        id = problemId,
         typeproblem = json['typeproblem'],
         problem = json['problem'],
         status = json['status'],
