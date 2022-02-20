@@ -474,6 +474,8 @@ class _SecondFormState extends State<SecondForm> {
                           'url': downloadURL,
                           'cohort': '',
                           'advisor': '',
+                          'email': _emailController.text,
+                          'archive': false,
                         });
                         Navigator.push(
                             context,

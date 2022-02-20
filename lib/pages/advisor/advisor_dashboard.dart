@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:padvisor/pages/advisor/view_student.dart';
 import 'package:padvisor/pages/model/advisor.dart';
 import 'package:padvisor/pages/model/announcement.dart';
-import 'package:padvisor/pages/services/auth.dart';
+import 'package:padvisor/pages/model/problems.dart';
+import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/services/database.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/color_constant.dart';
-import 'advisor_view_problem.dart';
 
 class AdvisorDashboard extends StatefulWidget {
   const AdvisorDashboard({Key? key}) : super(key: key);
@@ -81,8 +82,11 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
                             db,
                             advisor,
                           ),
-                          ProblemPage(),
-                          StudentList(),
+                          ProblemPage(
+                            db,
+                            advisor,
+                          ),
+                          StudentList(db),
                         ],
                       ),
                     ),
@@ -188,7 +192,10 @@ class _ViewAnnouncementState extends State<ViewAnnouncement> {
 }
 
 class ProblemPage extends StatefulWidget {
-  const ProblemPage({Key? key}) : super(key: key);
+  const ProblemPage(this.db, this.advisor, {Key? key}) : super(key: key);
+
+  final DatabaseService? db;
+  final Advisor? advisor;
 
   @override
   State<ProblemPage> createState() => _ProblemPageState();
@@ -197,124 +204,289 @@ class ProblemPage extends StatefulWidget {
 class _ProblemPageState extends State<ProblemPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: ListView.separated(
-            itemCount: 3,
-            separatorBuilder: (context, index) {
-              return const SizedBox(height: 15);
-            },
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AdvisorViewProblem()));
-                },
-                child: Container(
-                  height: 90,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: AppColor.primaryColor,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
+    return FutureBuilder(
+        future: widget.db!.getStudentsId('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        builder: (context, AsyncSnapshot<List<String>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            List<String>? studentIds = snapshot.data;
+            return FutureBuilder(
+                future: widget.db!.getStudentsProblems(studentIds!),
+                builder: (context, AsyncSnapshot<List<Problems>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SpinKitThreeInOut(
+                      color: AppColor.tertiaryColor,
+                    );
+                  } else {
+                    List<Problems>? problems = snapshot.data;
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Expanded(
-                          child: Text(
-                            'Student Name',
-                            style: TextStyle(
-                              fontSize: 22,
-                            ),
-                            textAlign: TextAlign.start,
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Text('Low Attendance'),
-                            const SizedBox(width: 8),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.green,
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 3.0,
-                                ),
-                                child: Text(
-                                  'Pending',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                        Expanded(
+                          child: ListView.separated(
+                            itemCount: problems!.length,
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(height: 15);
+                            },
+                            itemBuilder: (context, index) {
+                              Problems problem = problems[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ViewProblem(
+                                                problem,
+                                                isAdvisor: true,
+                                              )));
+                                },
+                                child: Container(
+                                  height: 90,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: AppColor.primaryColor,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            problem.studentName!,
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(problem.typeproblem!),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.green,
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 8.0,
+                                                  vertical: 3.0,
+                                                ),
+                                                child: Text(
+                                                  problem.status!,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              );
+                            },
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
+                    );
+                  }
+                });
+          }
+        });
   }
 }
 
 class StudentList extends StatefulWidget {
-  const StudentList({Key? key}) : super(key: key);
+  const StudentList(this.db, {Key? key}) : super(key: key);
+
+  final DatabaseService? db;
 
   @override
   _StudentListState createState() => _StudentListState();
 }
 
 class _StudentListState extends State<StudentList> {
+  getImage(String url) {
+    if (url.length < 1) {
+      return AssetImage('assets/logo/unknown.png');
+    } else {
+      return NetworkImage(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const CupertinoSearchTextField(),
-        Expanded(
-          child: ListView.separated(
-            itemCount: 4,
-            separatorBuilder: (context, index) {
-              return index == 4 ? const SizedBox.shrink() : const Divider();
-            },
-            itemBuilder: (context, index) {
-              return Container(
-                height: 55,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                child: ListTile(
-                  leading: const CircleAvatar(),
-                  title: const Text('Student Name'),
-                  subtitle: const Text('Student Year'),
-                  trailing: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.more_vert_outlined),
+    return FutureBuilder(
+        future:
+            widget.db!.getStudentsUnderAdvisor('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        builder: (context, AsyncSnapshot<List<Students>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            List<Students>? students = snapshot.data;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ViewArchivedStudent(widget.db, students)));
+                    },
+                    label: Text('Archived Students'),
+                    icon: Icon(Icons.archive_outlined)),
+                const CupertinoSearchTextField(),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: students!.length,
+                    separatorBuilder: (context, index) {
+                      return index == students.length
+                          ? const SizedBox.shrink()
+                          : const Divider();
+                    },
+                    itemBuilder: (context, index) {
+                      Students student = students[index];
+                      return student.archive == true
+                          ? SizedBox.shrink()
+                          : InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewStudent(student)));
+                              },
+                              child: Container(
+                                height: 55,
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 0),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: getImage(student.url!),
+                                  ),
+                                  title: Text(student.name!),
+                                  subtitle: Text(student.cohort!),
+                                  trailing: IconButton(
+                                    onPressed: () async {
+                                      widget.db!
+                                          .archiveStudent(student.uid!, true)
+                                          .whenComplete(() {
+                                        setState(() {});
+                                      });
+                                    },
+                                    icon: const Icon(Icons.archive_outlined),
+                                  ),
+                                ),
+                              ),
+                            );
+                    },
                   ),
                 ),
-              );
-            },
-          ),
+              ],
+            );
+          }
+        });
+  }
+}
+
+class ViewArchivedStudent extends StatefulWidget {
+  const ViewArchivedStudent(this.db, this.students, {Key? key})
+      : super(key: key);
+
+  final DatabaseService? db;
+  final List<Students>? students;
+
+  @override
+  State<ViewArchivedStudent> createState() => _ViewArchivedStudentState();
+}
+
+class _ViewArchivedStudentState extends State<ViewArchivedStudent> {
+  getImage(String url) {
+    if (url.length < 1) {
+      return AssetImage('assets/logo/unknown.png');
+    } else {
+      return NetworkImage(url);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print(widget.students!.length);
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: AppColor.tertiaryColor,
+        title: Text('Archived Students'),
+        centerTitle: true,
+      ),
+      body: Container(
+        child: ListView.separated(
+          itemCount: widget.students!.length,
+          separatorBuilder: (context, index) {
+            return index == widget.students!.length
+                ? const SizedBox.shrink()
+                : const Divider();
+          },
+          itemBuilder: (context, index) {
+            Students student = widget.students![index];
+            return student.archive == false
+                ? SizedBox.shrink()
+                : InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ViewStudent(student)));
+                    },
+                    child: Container(
+                      height: 55,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: getImage(student.url!),
+                        ),
+                        title: Text(student.name!),
+                        subtitle: Text(student.cohort!),
+                        trailing: IconButton(
+                          onPressed: () async {
+                            widget.db!
+                                .archiveStudent(student.uid!, false)
+                                .whenComplete(() {
+                              setState(() {
+                                widget.students!.remove(student);
+                              });
+                            });
+                          },
+                          icon: const Icon(Icons.archive_outlined),
+                        ),
+                      ),
+                    ),
+                  );
+          },
         ),
-      ],
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_up.dart';
+import 'package:padvisor/pages/staff_sign_up.dart';
 import 'package:padvisor/pages/student/student_dashboard.dart';
 
 import '../shared/color_constant.dart';
@@ -36,7 +37,7 @@ class _SignInState extends State<SignIn> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 75),
                   width: 375,
-                  height: 660,
+                  height: 600,
                   child: Column(
                     children: [
                       const SizedBox(
@@ -162,25 +163,52 @@ class _SignInState extends State<SignIn> {
                     children: [
                       const Text('Didn\'t have an account'),
                       const SizedBox(height: 10),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SignUp()));
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 50),
-                          decoration: BoxDecoration(
-                            color: AppColor.tertiaryColor,
-                            borderRadius: BorderRadius.circular(10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const SignUp()));
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 50),
+                              decoration: BoxDecoration(
+                                color: AppColor.tertiaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                'Sign Up',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                           ),
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(color: Colors.white),
+                          SizedBox(width: 10),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const StaffSignUp()));
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 50),
+                              decoration: BoxDecoration(
+                                color: AppColor.tertiaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                'Staff Sign Up',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

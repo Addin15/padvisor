@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Problems {
   String? url;
+  String? studentName;
   String? problem;
   String? typeproblem;
   String? status;
@@ -12,6 +13,7 @@ class Problems {
 
   Problems({
     this.typeproblem,
+    this.studentName,
     this.problem,
     this.status,
     this.url,
@@ -19,8 +21,9 @@ class Problems {
     this.feedback,
   });
 
-  Problems.fromJson(Map<String, dynamic> json)
-      : typeproblem = json['typeproblem'],
+  Problems.fromJson(Map<String, dynamic> json, {String? name = ''})
+      : studentName = name,
+        typeproblem = json['typeproblem'],
         problem = json['problem'],
         status = json['status'],
         url = json['url'],

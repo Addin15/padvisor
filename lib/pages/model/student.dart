@@ -11,6 +11,7 @@ class Students {
   String? cohort = '';
   String? advisor = '';
   String? email = '';
+  bool? archive = false;
 
   Students(
       {required this.uid,
@@ -21,7 +22,8 @@ class Students {
       this.advisor,
       this.cohort,
       this.url,
-      this.email});
+      this.email,
+      this.archive});
 
   Students.fromJson(String id, Map<String, dynamic> json)
       : uid = id,
@@ -32,5 +34,6 @@ class Students {
         whatsApp = json['whatsApp'],
         cohort = json['cohort'],
         advisor = json['advisor'],
+        archive = json['archive'],
         email = json['email'];
 }

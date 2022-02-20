@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluwx/fluwx.dart';
 
-import 'advisor_view_problem.dart';
-
 class ViewStudent extends StatefulWidget {
   const ViewStudent(
     this.student, {
@@ -191,9 +189,11 @@ class _ViewStudentState extends State<ViewStudent> {
 }
 
 class ViewProblem extends StatelessWidget {
-  const ViewProblem(this.problem, {Key? key}) : super(key: key);
+  const ViewProblem(this.problem, {Key? key, this.isAdvisor = false})
+      : super(key: key);
 
   final Problems? problem;
+  final bool? isAdvisor;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +240,16 @@ class ViewProblem extends StatelessWidget {
             Container(
               alignment: Alignment.center,
               child: (problem!.url!.length < 1)
-                  ? Text('No attachment provided')
+                  ? Column(
+                      children: [
+                        Text('No attachment provided'),
+                        (isAdvisor == true
+                            ? TextButton(
+                                onPressed: () {},
+                                child: Text('Ask for prove document'))
+                            : SizedBox.shrink()),
+                      ],
+                    )
                   : TextButton(
                       onPressed: () async {
                         if (await canLaunch(problem!.url!)) {

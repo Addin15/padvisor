@@ -173,5 +173,51 @@ class DatabaseService {
         await db.collection('advisors').doc(id).get();
     return Advisor(name: advisor.get('name'), cohorts: advisor.get('cohorts'));
   }
+
+  Future<void> archiveStudent(String id, bool archive) async {
+    await db.collection('students').doc(id).update({
+      'archive': archive,
+    });
+  }
+
+  Future<List<String>> getStudentsId(String advisor) async {
+    QuerySnapshot<Map<String, dynamic>> data = await db
+        .collection('students')
+        .where('advisor', isEqualTo: advisor)
+        .get();
+    return data.docs.map((e) => e.id).toList();
+  }
+
+  Future<List<Students>> getStudentsUnderAdvisor(String advisor) async {
+    QuerySnapshot<Map<String, dynamic>> data = await db
+        .collection('students')
+        .where('advisor', isEqualTo: advisor)
+        .get();
+    return data.docs.map((e) => Students.fromJson(e.id, e.data())).toList();
+  }
+
+  Future<List<Problems>> getStudentsProblems(List<String> studentIds) async {
+    List<Problems> problems = [];
+
+    for (String id in studentIds) {
+      DocumentSnapshot<Map<String, dynamic>> student =
+          await db.collection('students').doc(id).get();
+
+      if (student.get('archive') == false) {
+        QuerySnapshot<Map<String, dynamic>> data = await db
+            .collection('problems')
+            .doc(id)
+            .collection('studentproblems')
+            .get();
+
+        for (var doc in data.docs) {
+          problems
+              .add(Problems.fromJson(doc.data(), name: student.get('name')));
+        }
+      }
+    }
+
+    return problems;
+  }
   //---------------------------- ADVISOR --------------------------------//
 }
