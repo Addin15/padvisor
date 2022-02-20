@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:padvisor/pages/advisor/view_student.dart';
 import 'package:padvisor/pages/hod/create_announcement.dart';
 import 'package:padvisor/pages/model/student.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -30,6 +31,7 @@ class _HodDashboardState extends State<HodDashboard>
   @override
   Widget build(BuildContext context) {
     DatabaseService db = DatabaseService();
+    AuthService auth = AuthService();
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -37,7 +39,24 @@ class _HodDashboardState extends State<HodDashboard>
           child: Image.asset('assets/logo/logo_white.png'),
         ),
         elevation: 0.0,
+        centerTitle: true,
+        title: Column(
+          children: [
+            Text(
+              'Advisor',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+            ),
+          ],
+        ),
         backgroundColor: AppColor.tertiaryColor,
+        actions: [
+          IconButton(
+              onPressed: () {
+                auth.signOut();
+                Navigator.pushNamed(context, 'signin');
+              },
+              icon: Icon(Icons.logout_outlined))
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
