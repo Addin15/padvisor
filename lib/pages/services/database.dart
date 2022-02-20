@@ -68,64 +68,86 @@ class DatabaseService {
     }
   }
 
-  // GET ADVISOR-ADVISEE
-  // Future<Stream<List<Future<AdvisorAdvisee>>>>
-  getAdvisorAdvisee(String cohort) async {
+  // // GET STUDENTS LIST
+  // Stream<> getStudents() {
+  //   try {
+  //     db.collection('students').snapshots().map((snapshot) => snapshot.docs.map((doc) => ))
+  //   } catch (e) {
+  //     e.hashCode;
+  //   }
+  // }
+
+  // GET ADVISEE LIST
+  Future<List<Advisee>> get advisees async {
+    QuerySnapshot<Map<String, dynamic>> students =
+        await db.collection('students').get();
+    return students.docs
+        .map((doc) => Advisee(doc.id, doc.get('name')))
+        .toList();
+  }
+
+  // ADD ADVISEE INTO COHORT
+  Future<void> addAdviseeIntoCohort(
+      String advisee, String advisor, String cohort) async {
     try {
-      // DocumentSnapshot<Map<String, dynamic>> res =
-      //     await db.collection('cohorts').doc(cohort).get();
-      // print(res.get('reference'));
-      // Map<String, dynamic> advisoradvisee = await db
-      //     .collection('cohorts')
-      //     .doc(cohort)
-      //     .get()
-      //     .then((value) => value.get('advisors'));
+      await db.collection('students').doc(advisee).update({
+        'advisor': advisor,
+        'cohort': cohort,
+      });
+    } catch (e) {
+      e.hashCode;
+    }
+  }
 
-      // List<AdvisorAdvisee> advisorsAdvisees = [];
+  // GET ADVISOR LIST
+  Future<List<AdvisorAdvisee>> get advisors async {
+    QuerySnapshot<Map<String, dynamic>> advisors =
+        await db.collection('advisors').get();
+    return advisors.docs
+        .map((doc) => AdvisorAdvisee(doc.id, doc.get('name')))
+        .toList();
+  }
 
-      // for (int i = 0; i < advisoradvisee.length; i++) {
-      //   Map<String, dynamic> val = advisoradvisee.values.elementAt(i);
-      //   DocumentReference advisor = val.entries.elementAt(0).value;
-      //   String advisorName =
-      //       await advisor.get().then((value) => value.get('name'));
+  // ADD ADVISOR INTO COHORT
+  Future<void> addAdvisorInCohort(String advisor, String cohort) async {
+    try {
+      await db.collection('advisors').doc(advisor).update({
+        'cohorts': FieldValue.arrayUnion([cohort])
+      });
+    } catch (e) {
+      e.hashCode;
+    }
+  }
 
-      //   AdvisorAdvisee a = AdvisorAdvisee(advisor.id, advisorName);
-      //   List<dynamic> advisees = val.entries.elementAt(1).value;
-
-      //   List<Advisee> adviseesList = [];
-
-      //   for (DocumentReference b in advisees) {
-      //     String adviseeName = await b.get().then((value) => value.get('name'));
-      //     Advisee advisee = Advisee(b.id, adviseeName);
-      //     adviseesList.add(advisee);
-      //   }
-
-      //   a.setAdvisees(adviseesList);
-      //   advisorsAdvisees.add(a);
-      // }
-
-      // print(advisorsAdvisees.first.name);
-
-      // return advisorsAdvisees;
-      return db
+  // GET ADVISOR-ADVISEE
+  Future<List<AdvisorAdvisee>> getAdvisorAdvisee(String cohort) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> advisors = await db
           .collection('advisors')
           .where('cohorts', arrayContains: cohort)
-          .snapshots()
-          .map((snapshot) => snapshot.docs.map((doc) async {
-                AdvisorAdvisee advisorAdvisee =
-                    AdvisorAdvisee(doc.id, doc.get('name'));
-                List<Advisee> advisees = await db
-                    .collection('students')
-                    .where('advisor', isEqualTo: doc.id)
-                    .snapshots()
-                    .forEach((snapshot) => snapshot.docs
-                        .map((doc) => Advisee(doc.id, doc.get('name'))));
-                advisorAdvisee.setAdvisees(advisees);
-                return advisorAdvisee;
-              }).toList());
+          .get();
+
+      List<AdvisorAdvisee> advisoradvisee = advisors.docs
+          .map((doc) => AdvisorAdvisee(doc.id, doc.get('name')))
+          .toList();
+
+      for (var e in advisoradvisee) {
+        QuerySnapshot<Map<String, dynamic>> advisees = await db
+            .collection('students')
+            .where('advisor', isEqualTo: e.id)
+            .where('cohort', isEqualTo: cohort)
+            .get();
+
+        List<Advisee> a =
+            advisees.docs.map((a) => Advisee(a.id, a.get('name'))).toList();
+
+        e.setAdvisees(a);
+      }
+
+      return advisoradvisee;
     } catch (e) {
       print(e.toString());
-      return null;
+      return [];
     }
   }
 

@@ -27,6 +27,7 @@ class _HodDashboardState extends State<HodDashboard>
 
   @override
   Widget build(BuildContext context) {
+    DatabaseService db = DatabaseService();
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -63,7 +64,7 @@ class _HodDashboardState extends State<HodDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  ViewAnnouncement(),
+                  ViewAnnouncement(db),
                   StudentList(),
                 ],
               ),
@@ -76,14 +77,15 @@ class _HodDashboardState extends State<HodDashboard>
 }
 
 class ViewAnnouncement extends StatefulWidget {
-  const ViewAnnouncement({Key? key}) : super(key: key);
+  const ViewAnnouncement(this.db, {Key? key}) : super(key: key);
+
+  final DatabaseService db;
 
   @override
   _ViewAnnouncementState createState() => _ViewAnnouncementState();
 }
 
 class _ViewAnnouncementState extends State<ViewAnnouncement> {
-  DatabaseService db = DatabaseService();
   String? _selectedCohort = '';
 
   @override
@@ -91,7 +93,7 @@ class _ViewAnnouncementState extends State<ViewAnnouncement> {
     return Stack(
       children: [
         FutureBuilder(
-            future: db.getCohorts(),
+            future: widget.db.getCohorts(),
             builder: (context, AsyncSnapshot<List<String>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Scaffold(
@@ -133,9 +135,10 @@ class _ViewAnnouncementState extends State<ViewAnnouncement> {
                       ),
                       Expanded(
                         child: StreamProvider<List<Announcement>>.value(
-                          value: db.getAnnouncements(_selectedCohort!.isEmpty
-                              ? cohorts.elementAt(0)
-                              : _selectedCohort),
+                          value: widget.db.getAnnouncements(
+                              _selectedCohort!.isEmpty
+                                  ? cohorts.elementAt(0)
+                                  : _selectedCohort),
                           initialData: const [],
                           builder: (context, _) {
                             List<Announcement> announcements =

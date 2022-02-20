@@ -18,13 +18,6 @@ class ViewCohort extends StatefulWidget {
 class _ViewCohortState extends State<ViewCohort> {
   DatabaseService db = DatabaseService();
 
-  // getAdvisorAdvisee() async {
-  //   Map<String, List<String>> res = await db.getAdvisorAdvisee(widget.cohort!);
-  //   setState(() {
-  //     advisoradvisee = res;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,10 +37,12 @@ class _ViewCohortState extends State<ViewCohort> {
               style: TextStyle(color: AppColor.tertiaryColor, fontSize: 22),
             ),
             TextButton(
-                onPressed: () {
-                  db.getAdvisorAdvisee('2015-2016');
-                },
-                child: Text('test')),
+              onPressed: () {
+                showDialog(
+                    context: context, builder: (context) => addAdvisor());
+              },
+              child: Text('Add Advisor'),
+            ),
             const SizedBox(height: 15),
             Expanded(
               child: FutureBuilder(
@@ -61,12 +56,10 @@ class _ViewCohortState extends State<ViewCohort> {
                     } else {
                       List<AdvisorAdvisee>? advisoradvisee = snapshot.data;
 
-                      print(advisoradvisee!.length);
-
                       return ListView.separated(
                         separatorBuilder: (context, index) =>
                             const SizedBox(height: 10),
-                        itemCount: advisoradvisee.length,
+                        itemCount: advisoradvisee!.length,
                         itemBuilder: (context, index) {
                           AdvisorAdvisee advisor =
                               advisoradvisee.elementAt(index);
@@ -96,7 +89,15 @@ class _ViewCohortState extends State<ViewCohort> {
                                   );
                                 }).toList(),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                addAdvisee(advisor.id!))
+                                        .whenComplete(() {
+                                      setState(() {});
+                                    });
+                                  },
                                   child: Text('Add Advisee'),
                                 )
                               ],
@@ -106,6 +107,114 @@ class _ViewCohortState extends State<ViewCohort> {
                       );
                     }
                   }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  addAdvisor() {
+    return Dialog(
+      child: Container(
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+        child: Column(
+          children: [
+            Text('Select Advisor'),
+            SizedBox(height: 30),
+            FutureBuilder(
+              future: db.advisors,
+              builder: (context, AsyncSnapshot<List<AdvisorAdvisee>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SpinKitThreeInOut(
+                    color: AppColor.tertiaryColor,
+                  );
+                } else {
+                  List<AdvisorAdvisee>? advisors = snapshot.data;
+                  return Expanded(
+                    child: ListView.separated(
+                        itemCount: advisors!.length,
+                        separatorBuilder: (context, index) {
+                          if (index == advisors.length)
+                            return SizedBox.shrink();
+                          return SizedBox(height: 5);
+                        },
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () async {
+                              await db.addAdvisorInCohort(
+                                  advisors[index].id!, widget.cohort!);
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              height: 40,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(advisors[index].name!),
+                            ),
+                          );
+                        }),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  addAdvisee(String advisor) {
+    return Dialog(
+      child: Container(
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+        child: Column(
+          children: [
+            Text('Select Advisee'),
+            SizedBox(height: 30),
+            FutureBuilder(
+              future: db.advisees,
+              builder: (context, AsyncSnapshot<List<Advisee>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SpinKitThreeInOut(
+                    color: AppColor.tertiaryColor,
+                  );
+                } else {
+                  List<Advisee>? advisees = snapshot.data;
+                  return Expanded(
+                    child: ListView.separated(
+                        itemCount: advisees!.length,
+                        separatorBuilder: (context, index) {
+                          if (index == advisees.length)
+                            return SizedBox.shrink();
+                          return SizedBox(height: 5);
+                        },
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () async {
+                              await db.addAdviseeIntoCohort(
+                                  advisees[index].id!, advisor, widget.cohort!);
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              height: 40,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(advisees[index].name!),
+                            ),
+                          );
+                        }),
+                  );
+                }
+              },
             ),
           ],
         ),

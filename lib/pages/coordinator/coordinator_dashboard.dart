@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:padvisor/pages/coordinator/coordinator_view_cohort.dart';
+import 'package:provider/provider.dart';
 
 import '../../shared/color_constant.dart';
 import '../../shared/constant_styles.dart';
@@ -27,6 +28,7 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
 
   @override
   Widget build(BuildContext context) {
+    DatabaseService db = DatabaseService();
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -64,9 +66,9 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  ViewAnnouncement(),
-                  Cohorts(),
-                  StudentList(),
+                  ViewAnnouncement(db),
+                  Cohorts(db),
+                  StudentList(db),
                 ],
               ),
             ),
@@ -78,14 +80,14 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
 }
 
 class Cohorts extends StatefulWidget {
-  const Cohorts({Key? key}) : super(key: key);
+  const Cohorts(this.db, {Key? key}) : super(key: key);
+  final DatabaseService db;
 
   @override
   _CohortsState createState() => _CohortsState();
 }
 
 class _CohortsState extends State<Cohorts> {
-  DatabaseService db = DatabaseService();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -141,7 +143,8 @@ class _CohortsState extends State<Cohorts> {
                               InkWell(
                                 onTap: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    await db.addCohort(_cohortController.text);
+                                    await widget.db
+                                        .addCohort(_cohortController.text);
                                     Navigator.pop(context);
                                   }
                                 },
@@ -183,7 +186,7 @@ class _CohortsState extends State<Cohorts> {
         const SizedBox(height: 15),
         Expanded(
           child: FutureBuilder(
-              future: db.getCohorts(),
+              future: widget.db.getCohorts(),
               builder: (context, AsyncSnapshot<List<String>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
@@ -236,39 +239,51 @@ class _CohortsState extends State<Cohorts> {
 }
 
 class StudentList extends StatelessWidget {
-  const StudentList({Key? key}) : super(key: key);
+  const StudentList(this.db, {Key? key}) : super(key: key);
+
+  final DatabaseService db;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        CupertinoSearchTextField(),
-        Expanded(
-          child: ListView.separated(
-            itemCount: 4,
-            separatorBuilder: (context, index) {
-              return index == 4 ? SizedBox.shrink() : Divider();
-            },
-            itemBuilder: (context, index) {
-              return Container(
-                height: 55,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                child: ListTile(
-                  leading: CircleAvatar(),
-                  title: Text('Student Name'),
-                  subtitle: Text('Student Year'),
-                  trailing: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.more_vert_outlined),
+    return FutureBuilder(
+        future: db.advisees,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CupertinoSearchTextField(),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: 4,
+                    separatorBuilder: (context, index) {
+                      return index == 4 ? SizedBox.shrink() : Divider();
+                    },
+                    itemBuilder: (context, index) {
+                      return Container(
+                        height: 55,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 0),
+                        child: ListTile(
+                          leading: CircleAvatar(),
+                          title: Text('Student Name'),
+                          subtitle: Text('Student Year'),
+                          trailing: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.more_vert_outlined),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
+              ],
+            );
+          }
+        });
   }
 }
