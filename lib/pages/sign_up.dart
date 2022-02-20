@@ -472,6 +472,8 @@ class _SecondFormState extends State<SecondForm> {
                           'weChat': _weChatId.text,
                           'whatsApp': _whatsAppNumber.text,
                           'url': downloadURL,
+                          'cohort': '',
+                          'advisor': '',
                         });
                         Navigator.push(
                             context,

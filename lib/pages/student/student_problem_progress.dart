@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
@@ -6,13 +7,17 @@ import 'package:padvisor/shared/color_constant.dart';
 import '../sign_in.dart';
 
 class StudentProblem extends StatefulWidget {
-  const StudentProblem({Key? key}) : super(key: key);
+  final problem;
+  final typeproblem;
+
+  StudentProblem(this.typeproblem, this.problem, {Key? key}) : super(key: key);
 
   @override
   _StudentProblemState createState() => _StudentProblemState();
 }
 
 class _StudentProblemState extends State<StudentProblem> {
+  DatabaseService db = DatabaseService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +63,7 @@ class _StudentProblemState extends State<StudentProblem> {
                     children: [
                       SizedBox(height: 15),
                       Text(
-                        'problem type',
+                        widget.typeproblem,
                         style: TextStyle(
                           fontFamily: "Reem Kufi",
                           color: Colors.white,
@@ -85,7 +90,7 @@ class _StudentProblemState extends State<StudentProblem> {
                           readOnly: true,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Problem details',
+                              hintText: widget.problem,
                               hintStyle: TextStyle(
                                 color: AppColor.primaryColor,
                               )),

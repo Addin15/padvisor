@@ -108,10 +108,7 @@ class _SignInState extends State<SignIn> {
                               setState(() => password = value),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text('Forgot Password?'),
-                      ),
+                      SizedBox(height: 20),
                       InkWell(
                         onTap: () async {
                           final isValid = formKey.currentState!.validate();

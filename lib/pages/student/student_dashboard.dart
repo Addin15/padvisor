@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:padvisor/pages/advisor/advisor_dashboard.dart';
+import 'package:padvisor/pages/model/announcement.dart';
 import 'package:padvisor/pages/model/problems.dart';
+import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
-import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/pages/student/student_problem_progress.dart';
 import 'package:padvisor/pages/student/student_profile.dart';
 import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:provider/provider.dart';
+
+import '../sign_in.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({Key? key}) : super(key: key);
@@ -23,6 +28,7 @@ class _StudentDashboardState extends State<StudentDashboard>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
   DatabaseService db = DatabaseService();
+  AuthService auth = AuthService();
 
   @override
   void initState() {
@@ -49,6 +55,12 @@ class _StudentDashboardState extends State<StudentDashboard>
                         builder: (context) => const StudentProfile()));
               },
               icon: const Icon(Icons.person)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const SignIn()));
+              },
+              icon: const Icon(Icons.logout_outlined)),
         ],
       ),
       body: Container(
@@ -83,7 +95,7 @@ class _StudentDashboardState extends State<StudentDashboard>
                   controller: _tabController,
                   children: [
                     ViewProblems(db: db),
-                    Annoucement(),
+                    ViewAnnoucement(db: db),
                   ],
                 ),
               ),
@@ -95,62 +107,84 @@ class _StudentDashboardState extends State<StudentDashboard>
   }
 }
 
-class Annoucement extends StatefulWidget {
-  const Annoucement({Key? key, this.db}) : super(key: key);
+class ViewAnnoucement extends StatefulWidget {
+  const ViewAnnoucement({Key? key, this.db}) : super(key: key);
   final DatabaseService? db;
 
   @override
-  State<Annoucement> createState() => _Annoucement();
+  State<ViewAnnoucement> createState() => _ViewAnnoucement();
 }
 
-class _Annoucement extends State<Annoucement> {
+class _ViewAnnoucement extends State<ViewAnnoucement> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.primaryColor,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ExpansionTile(
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'addin bajingan',
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 18.0,
-                                    fontFamily: "Reem Kufi"),
-                              ),
-                            ),
-                            Text('12/2/2020',
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 14.0,
-                                    fontFamily: "Reem Kufi")),
-                          ],
-                        ),
-                        children: [
-                          Text('details'),
-                        ],
-                      ));
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 15);
-                },
-                itemCount: 2))
-      ],
-    );
+    return FutureBuilder(
+        future: widget.db!.getUser(AuthService().userId),
+        builder: (context, AsyncSnapshot<Students> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            Students? student = snapshot.data;
+            return StreamProvider<List<Announcement>>.value(
+                value: widget.db!.getAnnouncements(student!.cohort),
+                initialData: [],
+                builder: (context, child) {
+                  List<Announcement> annoucements =
+                      Provider.of<List<Announcement>>(context);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                          child: ListView.separated(
+                              itemBuilder: (context, index) {
+                                Announcement annoucement = annoucements[index];
+                                return Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: AppColor.primaryColor,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: ExpansionTile(
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              annoucement.title!,
+                                              style: TextStyle(
+                                                  color: AppColor.tertiaryColor,
+                                                  fontSize: 18.0,
+                                                  fontFamily: "Reem Kufi"),
+                                            ),
+                                          ),
+                                          Text(
+                                              DateFormat('dd-MM-yyyy').format(
+                                                  annoucement.timestamp!
+                                                      .toDate()),
+                                              style: TextStyle(
+                                                  color: AppColor.tertiaryColor,
+                                                  fontSize: 14.0,
+                                                  fontFamily: "Reem Kufi")),
+                                        ],
+                                      ),
+                                      children: [
+                                        Text(annoucement.announcement!),
+                                      ],
+                                    ));
+                              },
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(height: 15);
+                              },
+                              itemCount: annoucements.length))
+                    ],
+                  );
+                });
+          }
+        });
   }
 }
 
@@ -182,8 +216,8 @@ class _ViewProblems extends State<ViewProblems> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const StudentProblem()));
+                                  builder: (context) => StudentProblem(
+                                      problem.typeproblem, problem.problem)));
                         },
                         child: Container(
                           height: 90,
