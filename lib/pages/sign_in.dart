@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/services/auth.dart';
+import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/sign_up.dart';
 import 'package:padvisor/pages/staff_sign_up.dart';
 import 'package:padvisor/pages/student/student_dashboard.dart';
@@ -116,16 +119,25 @@ class _SignInState extends State<SignIn> {
                           if (isValid) {
                             dynamic result = await _auth
                                 .signInWithEmailAndPassword(email, password);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const StudentDashboard()));
+
                             if (result == null) {
                               setState(() {
                                 error =
                                     'could not sign in with those credentials';
                               });
+                            } else {
+                              DocumentSnapshot<Map<String, dynamic>> user =
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc((result as Students).uid)
+                                      .get();
+                              if (user['type'] == 'student') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StudentDashboard()));
+                              }
                             }
                           }
                         },
