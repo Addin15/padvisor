@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         'coordinator': (context) => const CoordinatorDashboard(),
         'advisor': (context) => const AdvisorDashboard(),
       },
-      initialRoute: 'hod',
+      initialRoute: 'signin',
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_up.dart';
@@ -6,6 +7,9 @@ import 'package:padvisor/pages/student/student_dashboard.dart';
 
 import '../shared/color_constant.dart';
 import '../shared/constant_styles.dart';
+import 'advisor/advisor_dashboard.dart';
+import 'coordinator/coordinator_dashboard.dart';
+import 'hod/hod_dashboard.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({
@@ -116,12 +120,38 @@ class _SignInState extends State<SignIn> {
                           if (isValid) {
                             dynamic result = await _auth
                                 .signInWithEmailAndPassword(email, password);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const StudentDashboard()));
-                            if (result == null) {
+                            if (result != null) {
+                              String type = await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(AuthService().userId)
+                                  .get()
+                                  .then((value) => value.get('type'));
+                              if (type == 'hod') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HodDashboard()));
+                              } else if (type == 'advisor') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AdvisorDashboard()));
+                              } else if (type == 'coordinator') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const CoordinatorDashboard()));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StudentDashboard()));
+                              }
+                            } else {
                               setState(() {
                                 error =
                                     'could not sign in with those credentials';
