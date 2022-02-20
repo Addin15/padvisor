@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:padvisor/pages/advisor/view_student.dart';
 import 'package:padvisor/pages/coordinator/coordinator_view_cohort.dart';
+import 'package:padvisor/pages/model/student.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/color_constant.dart';
@@ -243,47 +245,60 @@ class StudentList extends StatelessWidget {
 
   final DatabaseService db;
 
+  getImage(String url) {
+    if (url.length < 1) {
+      return AssetImage('assets/logo/unknown.png');
+    } else {
+      return NetworkImage(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: db.advisees,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SpinKitThreeInOut(
-              color: AppColor.tertiaryColor,
-            );
-          } else {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                CupertinoSearchTextField(),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: 4,
-                    separatorBuilder: (context, index) {
-                      return index == 4 ? SizedBox.shrink() : Divider();
-                    },
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height: 55,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        child: ListTile(
-                          leading: CircleAvatar(),
-                          title: Text('Student Name'),
-                          subtitle: Text('Student Year'),
-                          trailing: IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.more_vert_outlined),
-                          ),
+    return StreamProvider<List<Students>>.value(
+        value: db.getStudents(),
+        initialData: [],
+        catchError: (context, error) => [],
+        builder: (context, child) {
+          List<Students> students = Provider.of<List<Students>>(context);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CupertinoSearchTextField(),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: students.length,
+                  separatorBuilder: (context, index) {
+                    return index == students.length
+                        ? SizedBox.shrink()
+                        : Divider();
+                  },
+                  itemBuilder: (context, index) {
+                    Students student = students[index];
+                    return Container(
+                      height: 55,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: ListTile(
+                        onTap: () {
+                          print(student.uid);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ViewStudent(student)));
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage: getImage(student.url!),
                         ),
-                      );
-                    },
-                  ),
+                        title: Text(student.name!),
+                        subtitle: Text(student.cohort!),
+                      ),
+                    );
+                  },
                 ),
-              ],
-            );
-          }
+              ),
+            ],
+          );
         });
   }
 }

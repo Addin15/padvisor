@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:padvisor/pages/model/advisor.dart';
 import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/student/student_dashboard.dart';
@@ -82,14 +83,12 @@ class DatabaseService {
     }
   }
 
-  // // GET STUDENTS LIST
-  // Stream<> getStudents() {
-  //   try {
-  //     db.collection('students').snapshots().map((snapshot) => snapshot.docs.map((doc) => ))
-  //   } catch (e) {
-  //     e.hashCode;
-  //   }
-  // }
+  // GET STUDENTS LIST
+  Stream<List<Students>> getStudents() {
+    return db.collection('students').snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => Students.fromJson(doc.id, doc.data()))
+        .toList());
+  }
 
   // GET ADVISEE LIST
   Future<List<Advisee>> get advisees async {
@@ -166,4 +165,13 @@ class DatabaseService {
   }
 
   //---------------------------- PA COORDINATOR --------------------------------//
+
+  //---------------------------- ADVISOR --------------------------------//
+
+  Future<Advisor> advisor(String? id) async {
+    DocumentSnapshot<Map<String, dynamic>> advisor =
+        await db.collection('advisors').doc(id).get();
+    return Advisor(name: advisor.get('name'), cohorts: advisor.get('cohorts'));
+  }
+  //---------------------------- ADVISOR --------------------------------//
 }
