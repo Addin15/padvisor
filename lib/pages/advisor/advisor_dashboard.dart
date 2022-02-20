@@ -7,6 +7,7 @@ import 'package:padvisor/pages/model/advisor.dart';
 import 'package:padvisor/pages/model/announcement.dart';
 import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/model/student.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/services/database.dart';
 import 'package:provider/provider.dart';
 
@@ -32,25 +33,45 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
   @override
   Widget build(BuildContext context) {
     DatabaseService db = DatabaseService();
-    return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Image.asset('assets/logo/logo_white.png'),
-        ),
-        elevation: 0.0,
-        backgroundColor: AppColor.tertiaryColor,
-      ),
-      body: FutureBuilder(
-          future: db.advisor('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
-          builder: (context, AsyncSnapshot<Advisor> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SpinKitThreeInOut(
-                color: AppColor.tertiaryColor,
-              );
-            } else {
-              Advisor? advisor = snapshot.data;
-              return Container(
+    AuthService auth = AuthService();
+    return FutureBuilder(
+        future: db.advisor('Eh2d6l5WVYR434CwqpB6hDngcAo2'),
+        builder: (context, AsyncSnapshot<Advisor> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            Advisor? advisor = snapshot.data;
+            return Scaffold(
+              appBar: AppBar(
+                leading: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Image.asset('assets/logo/logo_white.png'),
+                ),
+                elevation: 0.0,
+                backgroundColor: AppColor.tertiaryColor,
+                centerTitle: true,
+                title: Column(
+                  children: [
+                    Text(advisor!.name!),
+                    Text(
+                      'Advisor',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+                    ),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        auth.signOut();
+                        Navigator.pushNamed(context, 'signin');
+                      },
+                      icon: Icon(Icons.logout_outlined))
+                ],
+              ),
+              body: Container(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
                 child: Column(
                   children: [
@@ -92,10 +113,10 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
                     ),
                   ],
                 ),
-              );
-            }
-          }),
-    );
+              ),
+            );
+          }
+        });
   }
 }
 

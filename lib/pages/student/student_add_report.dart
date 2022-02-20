@@ -140,6 +140,8 @@ class _AddReportState extends State<AddReport> {
                                 "problem": _problem.text,
                                 "url": url,
                                 "status": status,
+                                "feedback": '',
+                                "needFeedback": false,
                               };
                               FirebaseFirestore.instance
                                   .collection('problems')

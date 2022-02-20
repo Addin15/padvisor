@@ -35,4 +35,8 @@ class AuthService {
       return null;
     }
   }
+
+  signOut() {
+    _auth.signOut();
+  }
 }

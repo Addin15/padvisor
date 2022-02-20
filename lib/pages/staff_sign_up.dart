@@ -181,6 +181,13 @@ class _StaffSignUpState extends State<StaffSignUp> {
                                         _emailController.text,
                                         _passwordController.text);
 
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(authService.userId)
+                                    .set({
+                                  'type': selectedType,
+                                });
+
                                 if (res != null && selectedType == 'advisor') {
                                   await FirebaseFirestore.instance
                                       .collection('advisors')
