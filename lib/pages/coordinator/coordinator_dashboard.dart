@@ -44,7 +44,7 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
         title: Column(
           children: [
             Text(
-              'Advisor',
+              'Coordinator',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
             ),
           ],

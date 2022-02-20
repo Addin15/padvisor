@@ -43,7 +43,7 @@ class _HodDashboardState extends State<HodDashboard>
         title: Column(
           children: [
             Text(
-              'Advisor',
+              'Head Of Department',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
             ),
           ],
