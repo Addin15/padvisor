@@ -464,11 +464,6 @@ class _SecondFormState extends State<SecondForm> {
                         }
 
                         await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc((result as Students).uid)
-                            .set({'type': 'student'});
-
-                        await FirebaseFirestore.instance
                             .collection('students')
                             .doc((result as Students).uid)
                             .set({
