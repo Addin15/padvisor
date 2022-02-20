@@ -322,6 +322,10 @@ class StudentList extends StatefulWidget {
 }
 
 class _StudentListState extends State<StudentList> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
+  bool _isSearching = false;
+
   getImage(String url) {
     if (url.length < 1) {
       return AssetImage('assets/logo/unknown.png');
@@ -341,7 +345,15 @@ class _StudentListState extends State<StudentList> {
               color: AppColor.tertiaryColor,
             );
           } else {
-            List<Students>? students = snapshot.data;
+            List<Students>? studentList = snapshot.data;
+            List<Students> students = [];
+            for (var value in studentList!) {
+              if (value.name!
+                  .toLowerCase()
+                  .contains(_searchController.text.toLowerCase())) {
+                students.add(value);
+              }
+            }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -355,10 +367,31 @@ class _StudentListState extends State<StudentList> {
                     },
                     label: Text('Archived Students'),
                     icon: Icon(Icons.archive_outlined)),
-                const CupertinoSearchTextField(),
+                CupertinoSearchTextField(
+                  focusNode: _searchFocus,
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      if (value.isEmpty) {
+                        _isSearching = false;
+                      } else {
+                        _isSearching = true;
+                      }
+                    });
+                  },
+                  onSubmitted: (value) {
+                    setState(() {
+                      if (value.isEmpty) {
+                        _isSearching = false;
+                      } else {
+                        _isSearching = true;
+                      }
+                    });
+                  },
+                ),
                 Expanded(
                   child: ListView.separated(
-                    itemCount: students!.length,
+                    itemCount: students.length,
                     separatorBuilder: (context, index) {
                       return index == students.length
                           ? const SizedBox.shrink()
