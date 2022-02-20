@@ -60,7 +60,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
               child: TabBarView(
                 controller: _tabController,
                 children: const [
-                  Announcement(),
+                  ViewAnnouncement(),
                   ProblemPage(),
                   StudentList(),
                 ],
@@ -73,14 +73,14 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
   }
 }
 
-class Announcement extends StatefulWidget {
-  const Announcement({Key? key}) : super(key: key);
+class ViewAnnouncement extends StatefulWidget {
+  const ViewAnnouncement({Key? key}) : super(key: key);
 
   @override
-  _AnnouncementState createState() => _AnnouncementState();
+  _ViewAnnouncementState createState() => _ViewAnnouncementState();
 }
 
-class _AnnouncementState extends State<Announcement> {
+class _ViewAnnouncementState extends State<ViewAnnouncement> {
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:padvisor/pages/advisor/advisor_dashboard.dart';
+import 'package:padvisor/pages/model/announcement.dart';
+import 'package:padvisor/pages/model/problems.dart';
+import 'package:padvisor/pages/model/student.dart';
+import 'package:padvisor/pages/services/auth.dart';
+import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
-import 'package:padvisor/pages/student/student_annoucement.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
+import 'package:padvisor/pages/student/student_problem_progress.dart';
 import 'package:padvisor/pages/student/student_profile.dart';
 import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
+import 'package:provider/provider.dart';
+
+import '../sign_in.dart';
 
 class StudentDashboard extends StatefulWidget {
   const StudentDashboard({Key? key}) : super(key: key);
@@ -17,10 +27,12 @@ class StudentDashboard extends StatefulWidget {
 class _StudentDashboardState extends State<StudentDashboard>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  DatabaseService db = DatabaseService();
+  AuthService auth = AuthService();
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
 
@@ -43,6 +55,12 @@ class _StudentDashboardState extends State<StudentDashboard>
                         builder: (context) => const StudentProfile()));
               },
               icon: const Icon(Icons.person)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const SignIn()));
+              },
+              icon: const Icon(Icons.logout_outlined)),
         ],
       ),
       body: Container(
@@ -60,8 +78,7 @@ class _StudentDashboardState extends State<StudentDashboard>
               ),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black,
-              tabs: const [
-                Tab(icon: Icon(Icons.star_outline), text: 'Feedback'),
+              tabs: [
                 Tab(
                     icon: Icon(Icons.report_problem_outlined),
                     text: 'Problems'),
@@ -76,10 +93,9 @@ class _StudentDashboardState extends State<StudentDashboard>
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: TabBarView(
                   controller: _tabController,
-                  children: const [
-                    Feedback(),
-                    Problems(),
-                    Annoucement(),
+                  children: [
+                    ViewProblems(db: db),
+                    ViewAnnoucement(db: db),
                   ],
                 ),
               ),
@@ -91,249 +107,193 @@ class _StudentDashboardState extends State<StudentDashboard>
   }
 }
 
-class Annoucement extends StatefulWidget {
-  const Annoucement({Key? key}) : super(key: key);
+class ViewAnnoucement extends StatefulWidget {
+  const ViewAnnoucement({Key? key, this.db}) : super(key: key);
+  final DatabaseService? db;
 
   @override
-  State<Annoucement> createState() => _Annoucement();
+  State<ViewAnnoucement> createState() => _ViewAnnoucement();
 }
 
-class _Annoucement extends State<Annoucement> {
+class _ViewAnnoucement extends State<ViewAnnoucement> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.primaryColor,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ExpansionTile(
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'adin bajingan',
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 18.0,
-                                    fontFamily: "Reem Kufi"),
-                              ),
-                            ),
-                            Text(
-                                DateFormat('dd/MM/yyyy').format(
-                                  DateTime.now(),
-                                ),
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 14.0,
-                                    fontFamily: "Reem Kufi")),
-                          ],
-                        ),
-                        children: [
-                          Text('details'),
-                        ],
-                      ));
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 15);
-                },
-                itemCount: 2))
-      ],
-    );
-  }
-}
-
-class Problems extends StatefulWidget {
-  const Problems({Key? key}) : super(key: key);
-
-  @override
-  State<Problems> createState() => _Problems();
-}
-
-class _Problems extends State<Problems> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: ListView.separated(
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UploadDoc()));
-                  },
-                  child: Container(
-                    height: 90,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColor.primaryColor,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              'Low Attendance',
-                              style: TextStyle(
-                                  color: AppColor.tertiaryColor,
-                                  fontSize: 18.0,
-                                  fontFamily: "Reem Kufi"),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.yellow[900],
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 3.0,
-                                  ),
-                                  child: Text(
-                                    'Pending',
-                                    style: TextStyle(
-                                      color: Colors.white,
+    return FutureBuilder(
+        future: widget.db!.getUser(AuthService().userId),
+        builder: (context, AsyncSnapshot<Students> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            Students? student = snapshot.data;
+            return StreamProvider<List<Announcement>>.value(
+                value: widget.db!.getAnnouncements(student!.cohort),
+                initialData: [],
+                builder: (context, child) {
+                  List<Announcement> annoucements =
+                      Provider.of<List<Announcement>>(context);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                          child: ListView.separated(
+                              itemBuilder: (context, index) {
+                                Announcement annoucement = annoucements[index];
+                                return Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: AppColor.primaryColor,
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(15),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const SizedBox(height: 15);
-              },
-              itemCount: 3),
-        ),
-        Container(
-          padding: EdgeInsets.all(20),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddReport()),
-              );
-            },
-            backgroundColor: AppColor.primaryColor,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ],
-    );
+                                    child: ExpansionTile(
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              annoucement.title!,
+                                              style: TextStyle(
+                                                  color: AppColor.tertiaryColor,
+                                                  fontSize: 18.0,
+                                                  fontFamily: "Reem Kufi"),
+                                            ),
+                                          ),
+                                          Text(
+                                              DateFormat('dd-MM-yyyy').format(
+                                                  annoucement.timestamp!
+                                                      .toDate()),
+                                              style: TextStyle(
+                                                  color: AppColor.tertiaryColor,
+                                                  fontSize: 14.0,
+                                                  fontFamily: "Reem Kufi")),
+                                        ],
+                                      ),
+                                      children: [
+                                        Text(annoucement.announcement!),
+                                      ],
+                                    ));
+                              },
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(height: 15);
+                              },
+                              itemCount: annoucements.length))
+                    ],
+                  );
+                });
+          }
+        });
   }
 }
 
-class Feedback extends StatefulWidget {
-  const Feedback({Key? key}) : super(key: key);
+class ViewProblems extends StatefulWidget {
+  const ViewProblems({Key? key, this.db}) : super(key: key);
+  final DatabaseService? db;
 
   @override
-  State<Feedback> createState() => _Feedback();
+  State<ViewProblems> createState() => _ViewProblems();
 }
 
-class _Feedback extends State<Feedback> {
+class _ViewProblems extends State<ViewProblems> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const StudentFeedback()));
-                    },
-                    child: Container(
-                      height: 90,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColor.primaryColor,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Low Grades',
-                                style: TextStyle(
-                                    color: AppColor.tertiaryColor,
-                                    fontSize: 18.0,
-                                    fontFamily: "Reem Kufi"),
-                                textAlign: TextAlign.start,
-                              ),
+    return StreamProvider<List<Problems>>.value(
+        value: widget.db!.getProblems(AuthService().userId),
+        initialData: const [],
+        builder: (context, child) {
+          List<Problems> problems = Provider.of<List<Problems>>(context);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      Problems problem = problems[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StudentProblem(
+                                      problem.typeproblem, problem.problem)));
+                        },
+                        child: Container(
+                          height: 90,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColor.primaryColor,
+                              width: 2,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.green,
+                                Expanded(
+                                  child: Text(
+                                    problem.typeproblem!,
+                                    style: TextStyle(
+                                        color: AppColor.tertiaryColor,
+                                        fontSize: 18.0,
+                                        fontFamily: "Reem Kufi"),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                      vertical: 3.0,
-                                    ),
-                                    child: Text(
-                                      'Submited',
-                                      style: TextStyle(
-                                        color: Colors.white,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.green,
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 3.0,
+                                        ),
+                                        child: Text(
+                                          problem.status!,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 15);
-                },
-                itemCount: 2))
-      ],
-    );
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(height: 15);
+                    },
+                    itemCount: problems.length),
+              ),
+              Container(
+                padding: EdgeInsets.all(20),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddReport()),
+                    );
+                  },
+                  backgroundColor: AppColor.primaryColor,
+                  child: Icon(Icons.add),
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
