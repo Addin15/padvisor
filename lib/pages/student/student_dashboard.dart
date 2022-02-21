@@ -124,6 +124,9 @@ class _ViewAnnoucement extends State<ViewAnnoucement> {
             );
           } else {
             Students? student = snapshot.data;
+            if (student!.cohort!.isEmpty) {
+              return Center(child: Text('No cohort assigned yet'));
+            }
             return StreamProvider<List<Announcement>>.value(
                 value: widget.db!.getAnnouncements(student!.cohort),
                 initialData: [],

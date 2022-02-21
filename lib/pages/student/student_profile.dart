@@ -89,6 +89,7 @@ class _StudentProfileState extends State<StudentProfile> {
               TextEditingController(text: user.whatsApp);
           TextEditingController weChatController =
               TextEditingController(text: user.weChat);
+          downloadURL = user.url;
           return Scaffold(
             appBar: AppBar(
               centerTitle: true,
