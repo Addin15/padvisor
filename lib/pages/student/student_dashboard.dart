@@ -57,6 +57,7 @@ class _StudentDashboardState extends State<StudentDashboard>
               icon: const Icon(Icons.person)),
           IconButton(
               onPressed: () {
+                auth.signOut();
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const SignIn()));
               },
