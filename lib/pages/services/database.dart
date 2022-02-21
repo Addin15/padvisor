@@ -39,7 +39,7 @@ class DatabaseService {
         .collection('studentproblems')
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Problems.fromJson(doc.id, doc.data()))
+            .map((doc) => Problems.fromJson(doc.id, studentId!, doc.data()))
             .toList());
   }
 
@@ -177,6 +177,15 @@ class DatabaseService {
 
   //---------------------------- ADVISOR --------------------------------//
 
+  Future<void> askForAttachment(String studentId, String problemId) async {
+    await db
+        .collection('problems')
+        .doc(studentId)
+        .collection('studentproblems')
+        .doc(problemId)
+        .update({'status': 'require prove document'});
+  }
+
   Future<Advisor> advisor(String? id) async {
     DocumentSnapshot<Map<String, dynamic>> advisor =
         await db.collection('advisors').doc(id).get();
@@ -220,8 +229,8 @@ class DatabaseService {
             .get();
 
         for (var doc in data.docs) {
-          problems.add(
-              Problems.fromJson(doc.id, doc.data(), name: student.get('name')));
+          problems.add(Problems.fromJson(doc.id, id, doc.data(),
+              name: student.get('name')));
         }
       }
     }

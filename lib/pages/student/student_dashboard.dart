@@ -128,7 +128,7 @@ class _ViewAnnoucement extends State<ViewAnnoucement> {
               return Center(child: Text('No cohort assigned yet'));
             }
             return StreamProvider<List<Announcement>>.value(
-                value: widget.db!.getAnnouncements(student!.cohort),
+                value: widget.db!.getAnnouncements(student.cohort),
                 initialData: [],
                 builder: (context, child) {
                   List<Announcement> annoucements =
@@ -216,10 +216,8 @@ class _ViewProblems extends State<ViewProblems> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => StudentProblem(
-                                      problem.typeproblem,
-                                      problem.problem,
-                                      problem.id)));
+                                  builder: (context) =>
+                                      StudentProblem(problem)));
                         },
                         child: Container(
                           height: 90,

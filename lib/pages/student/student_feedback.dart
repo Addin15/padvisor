@@ -129,6 +129,7 @@ class _StudentFeedbackState extends State<StudentFeedback> {
                               'rating': rating,
                               'feedback': feedbackController.text,
                               'needFeedback': false,
+                              'status': 'feedback submitted'
                             });
                             Navigator.pop(context);
                           },

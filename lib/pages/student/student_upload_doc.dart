@@ -1,16 +1,20 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:padvisor/pages/api/firebase_api.dart';
+import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/sign_in.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:path/path.dart';
 
 class UploadDoc extends StatefulWidget {
-  const UploadDoc({Key? key}) : super(key: key);
+  const UploadDoc(this.problemID, {Key? key}) : super(key: key);
+
+  final String? problemID;
 
   @override
   _UploadDocState createState() => _UploadDocState();
@@ -155,6 +159,16 @@ class _UploadDocState extends State<UploadDoc> {
     if (task == null) return;
     final snapshot = await task!.whenComplete(() {});
     final urlDownload = await snapshot.ref.getDownloadURL();
+
+    FirebaseFirestore.instance
+        .collection('problems')
+        .doc(AuthService().userId)
+        .collection('studentproblems')
+        .doc(widget.problemID)
+        .update({
+      'url': urlDownload,
+      'status': 'attachment provided',
+    });
     print('Download link: $urlDownload');
   }
 

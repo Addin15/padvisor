@@ -204,6 +204,7 @@ class ViewProblem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DatabaseService db = DatabaseService();
     return Scaffold(
       appBar: AppBar(
         title: Text('Problem Details'),
@@ -252,7 +253,10 @@ class ViewProblem extends StatelessWidget {
                         Text('No attachment provided'),
                         (isAdvisor == true
                             ? TextButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await db.askForAttachment(
+                                      problem!.studentId!, problem!.id!);
+                                },
                                 child: Text('Ask for prove document'))
                             : SizedBox.shrink()),
                       ],

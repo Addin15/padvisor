@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../sign_in.dart';
 
 class StudentProblem extends StatefulWidget {
-  final problem;
-  final typeproblem;
-  final id;
-  StudentProblem(this.typeproblem, this.problem, this.id, {Key? key})
-      : super(key: key);
+  final Problems? problem;
+
+  const StudentProblem(this.problem, {Key? key}) : super(key: key);
 
   @override
   _StudentProblemState createState() => _StudentProblemState();
@@ -64,7 +64,7 @@ class _StudentProblemState extends State<StudentProblem> {
                     children: [
                       SizedBox(height: 15),
                       Text(
-                        widget.typeproblem,
+                        widget.problem!.typeproblem!,
                         style: TextStyle(
                           fontFamily: "Reem Kufi",
                           color: Colors.white,
@@ -91,22 +91,50 @@ class _StudentProblemState extends State<StudentProblem> {
                           readOnly: true,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: widget.problem,
+                              hintText: widget.problem!.problem,
                               hintStyle: TextStyle(
                                 color: AppColor.primaryColor,
                               )),
                         ),
                       ),
                       SizedBox(height: 20),
+                      (widget.problem!.url!.isEmpty)
+                          ? SizedBox.shrink()
+                          : Column(
+                              children: [
+                                Text('Attachments'),
+                                TextButton(
+                                    onPressed: () {
+                                      launch(widget.problem!.url!);
+                                    },
+                                    child: Text('Download')),
+                              ],
+                            ),
+                      (widget.problem!.feedback!.isEmpty)
+                          ? SizedBox.shrink()
+                          : Column(
+                              children: [
+                                Text('Feedback'),
+                                TextFormField(
+                                  readOnly: true,
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                    hintText: widget.problem!.feedback!,
+                                  ),
+                                )
+                              ],
+                            ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const UploadDoc()));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              UploadDoc(widget.problem!.id)))
+                                  .whenComplete(() => Navigator.pop(context));
                             },
                             child: Text(
                               'Upload Report',
@@ -121,10 +149,11 @@ class _StudentProblemState extends State<StudentProblem> {
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          StudentFeedback(widget.id)));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => StudentFeedback(
+                                              widget.problem!.id!)))
+                                  .whenComplete(() => Navigator.pop(context));
                             },
                             child: Text(
                               'Give Feedback',
