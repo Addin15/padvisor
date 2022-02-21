@@ -38,8 +38,10 @@ class _ViewCohortState extends State<ViewCohort> {
             ),
             TextButton(
               onPressed: () {
-                showDialog(
-                    context: context, builder: (context) => addAdvisor());
+                showDialog(context: context, builder: (context) => addAdvisor())
+                    .whenComplete(() {
+                  setState(() {});
+                });
               },
               child: Text('Add Advisor'),
             ),

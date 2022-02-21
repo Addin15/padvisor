@@ -54,7 +54,7 @@ class _CoordinatorDashboardState extends State<CoordinatorDashboard>
           IconButton(
               onPressed: () {
                 auth.signOut();
-                Navigator.pushNamed(context, 'signin');
+                Navigator.pushReplacementNamed(context, 'signin');
               },
               icon: Icon(Icons.logout_outlined))
         ],
@@ -264,6 +264,33 @@ class StudentList extends StatelessWidget {
 
   final DatabaseService db;
 
+  @override
+  Widget build(BuildContext context) {
+    return StreamProvider<List<Students>>.value(
+        value: db.getStudents(),
+        initialData: [],
+        catchError: (context, error) => [],
+        builder: (context, child) {
+          List<Students> students = Provider.of<List<Students>>(context);
+          return StudentListSearchEnabled(students);
+        });
+  }
+}
+
+class StudentListSearchEnabled extends StatefulWidget {
+  const StudentListSearchEnabled(this.students, {Key? key}) : super(key: key);
+
+  final List<Students>? students;
+
+  @override
+  _StudentListSearchEnabledState createState() =>
+      _StudentListSearchEnabledState();
+}
+
+class _StudentListSearchEnabledState extends State<StudentListSearchEnabled> {
+  TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
   getImage(String url) {
     if (url.length < 1) {
       return AssetImage('assets/logo/unknown.png');
@@ -274,50 +301,60 @@ class StudentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<List<Students>>.value(
-        value: db.getStudents(),
-        initialData: [],
-        catchError: (context, error) => [],
-        builder: (context, child) {
-          List<Students> students = Provider.of<List<Students>>(context);
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CupertinoSearchTextField(),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: students.length,
-                  separatorBuilder: (context, index) {
-                    return index == students.length
-                        ? SizedBox.shrink()
-                        : Divider();
+    List<Students> students = [];
+    for (var value in widget.students!) {
+      if (value.name!
+          .toLowerCase()
+          .contains(_searchController.text.toLowerCase())) {
+        students.add(value);
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        CupertinoSearchTextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {
+              if (value.isEmpty) {
+                _isSearching = false;
+              } else {
+                _isSearching = true;
+              }
+            });
+          },
+        ),
+        Expanded(
+          child: ListView.separated(
+            itemCount: students.length,
+            separatorBuilder: (context, index) {
+              return index == students.length ? SizedBox.shrink() : Divider();
+            },
+            itemBuilder: (context, index) {
+              Students student = students[index];
+              return Container(
+                height: 55,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 0),
+                child: ListTile(
+                  onTap: () {
+                    print(student.uid);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ViewStudent(student)));
                   },
-                  itemBuilder: (context, index) {
-                    Students student = students[index];
-                    return Container(
-                      height: 55,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(vertical: 0),
-                      child: ListTile(
-                        onTap: () {
-                          print(student.uid);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ViewStudent(student)));
-                        },
-                        leading: CircleAvatar(
-                          backgroundImage: getImage(student.url!),
-                        ),
-                        title: Text(student.name!),
-                        subtitle: Text(student.cohort!),
-                      ),
-                    );
-                  },
+                  leading: CircleAvatar(
+                    backgroundImage: getImage(student.url!),
+                  ),
+                  title: Text(student.name!),
+                  subtitle: Text(student.cohort!),
                 ),
-              ),
-            ],
-          );
-        });
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
-import 'package:padvisor/pages/advisor/advisor_dashboard.dart';
 import 'package:padvisor/pages/model/announcement.dart';
 import 'package:padvisor/pages/model/problems.dart';
 import 'package:padvisor/pages/model/student.dart';
 import 'package:padvisor/pages/services/auth.dart';
 import 'package:padvisor/pages/services/database.dart';
 import 'package:padvisor/pages/student/student_add_report.dart';
-import 'package:padvisor/pages/student/student_feedback.dart';
 import 'package:padvisor/pages/student/student_problem_progress.dart';
 import 'package:padvisor/pages/student/student_profile.dart';
-import 'package:padvisor/pages/student/student_upload_doc.dart';
 import 'package:padvisor/shared/color_constant.dart';
 import 'package:provider/provider.dart';
 
@@ -58,8 +55,7 @@ class _StudentDashboardState extends State<StudentDashboard>
           IconButton(
               onPressed: () {
                 auth.signOut();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const SignIn()));
+                Navigator.pushReplacementNamed(context, 'signin');
               },
               icon: const Icon(Icons.logout_outlined)),
         ],

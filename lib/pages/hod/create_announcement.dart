@@ -38,10 +38,16 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
           } else {
             List<String>? cohorts = snapshot.data;
 
+            if (cohorts!.isNotEmpty) {
+              _selectedCohort = cohorts.first;
+            }
+
             return Scaffold(
               appBar: AppBar(
                 elevation: 0.0,
                 backgroundColor: AppColor.tertiaryColor,
+                title: Text('Create Announcement'),
+                centerTitle: true,
                 actions: [
                   IconButton(
                     onPressed: () async {
@@ -80,10 +86,10 @@ class _CreateAnnouncementState extends State<CreateAnnouncement> {
                                     });
                                   },
                                   value: _selectedCohort!.isEmpty
-                                      ? cohorts!.elementAt(0)
+                                      ? cohorts.elementAt(0)
                                       : _selectedCohort,
                                   items: [
-                                    ...cohorts!
+                                    ...cohorts
                                         .map((cohort) => DropdownMenuItem(
                                               child: Text(cohort),
                                               value: cohort,

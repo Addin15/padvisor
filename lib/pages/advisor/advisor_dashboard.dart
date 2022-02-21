@@ -66,7 +66,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard>
                   IconButton(
                       onPressed: () {
                         auth.signOut();
-                        Navigator.pushNamed(context, 'signin');
+                        Navigator.pushReplacementNamed(context, 'signin');
                       },
                       icon: Icon(Icons.logout_outlined))
                 ],
@@ -345,8 +345,36 @@ class StudentList extends StatefulWidget {
 }
 
 class _StudentListState extends State<StudentList> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: widget.db!.getStudentsUnderAdvisor(AuthService().userId),
+        builder: (context, AsyncSnapshot<List<Students>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SpinKitThreeInOut(
+              color: AppColor.tertiaryColor,
+            );
+          } else {
+            List<Students>? studentList = snapshot.data;
+            return StudentListWithSearch(db: widget.db, students: studentList);
+          }
+        });
+  }
+}
+
+class StudentListWithSearch extends StatefulWidget {
+  const StudentListWithSearch({Key? key, this.students, this.db})
+      : super(key: key);
+
+  final DatabaseService? db;
+  final List<Students>? students;
+
+  @override
+  _StudentListWithSearchState createState() => _StudentListWithSearchState();
+}
+
+class _StudentListWithSearchState extends State<StudentListWithSearch> {
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocus = FocusNode();
   bool _isSearching = false;
 
   getImage(String url) {
@@ -359,109 +387,86 @@ class _StudentListState extends State<StudentList> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: widget.db!.getStudentsUnderAdvisor(AuthService().userId),
-        builder: (context, AsyncSnapshot<List<Students>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SpinKitThreeInOut(
-              color: AppColor.tertiaryColor,
-            );
-          } else {
-            List<Students>? studentList = snapshot.data;
-            List<Students> students = [];
-            for (var value in studentList!) {
-              if (value.name!
-                  .toLowerCase()
-                  .contains(_searchController.text.toLowerCase())) {
-                students.add(value);
+    List<Students> students = [];
+    for (var value in widget.students!) {
+      if (value.name!
+          .toLowerCase()
+          .contains(_searchController.text.toLowerCase())) {
+        students.add(value);
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextButton.icon(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewArchivedStudent(widget.db, students)));
+            },
+            label: Text('Archived Students'),
+            icon: Icon(Icons.archive_outlined)),
+        CupertinoSearchTextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {
+              if (value.isEmpty) {
+                _isSearching = false;
+              } else {
+                _isSearching = true;
               }
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ViewArchivedStudent(widget.db, students)));
-                    },
-                    label: Text('Archived Students'),
-                    icon: Icon(Icons.archive_outlined)),
-                CupertinoSearchTextField(
-                  focusNode: _searchFocus,
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      if (value.isEmpty) {
-                        _isSearching = false;
-                      } else {
-                        _isSearching = true;
-                      }
-                    });
-                  },
-                  onSubmitted: (value) {
-                    setState(() {
-                      if (value.isEmpty) {
-                        _isSearching = false;
-                      } else {
-                        _isSearching = true;
-                      }
-                    });
-                  },
-                ),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: students.length,
-                    separatorBuilder: (context, index) {
-                      return index == students.length
-                          ? const SizedBox.shrink()
-                          : const Divider();
-                    },
-                    itemBuilder: (context, index) {
-                      Students student = students[index];
-                      return student.archive == true
-                          ? SizedBox.shrink()
-                          : InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ViewStudent(student)));
-                              },
-                              child: Container(
-                                height: 55,
-                                alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 0),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage: getImage(student.url!),
-                                  ),
-                                  title: Text(student.name!),
-                                  subtitle: Text(student.cohort!),
-                                  trailing: IconButton(
-                                    onPressed: () async {
-                                      widget.db!
-                                          .archiveStudent(student.uid!, true)
-                                          .whenComplete(() {
-                                        setState(() {});
-                                      });
-                                    },
-                                    icon: const Icon(Icons.archive_outlined),
-                                  ),
-                                ),
-                              ),
-                            );
-                    },
-                  ),
-                ),
-              ],
-            );
-          }
-        });
+            });
+          },
+        ),
+        Expanded(
+          child: ListView.separated(
+            itemCount: students.length,
+            separatorBuilder: (context, index) {
+              return index == students.length
+                  ? const SizedBox.shrink()
+                  : const Divider();
+            },
+            itemBuilder: (context, index) {
+              Students student = students[index];
+              return student.archive == true
+                  ? SizedBox.shrink()
+                  : InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ViewStudent(student)));
+                      },
+                      child: Container(
+                        height: 55,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: getImage(student.url!),
+                          ),
+                          title: Text(student.name!),
+                          subtitle: Text(student.cohort!),
+                          trailing: IconButton(
+                            onPressed: () async {
+                              widget.db!
+                                  .archiveStudent(student.uid!, true)
+                                  .whenComplete(() {
+                                setState(() {});
+                              });
+                            },
+                            icon: const Icon(Icons.archive_outlined),
+                          ),
+                        ),
+                      ),
+                    );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }
 
